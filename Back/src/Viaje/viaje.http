@@ -1,0 +1,62 @@
+### Obtener todos los viajes
+GET http://localhost:3000/api/viajes
+
+###
+
+### Obtener un viaje por ID
+GET http://localhost:3000/api/viajes/1
+
+###
+
+### Crear un nuevo viaje
+POST http://localhost:3000/api/viajes
+Content-Type: application/json
+
+{
+  "fechaSalida": "2024-01-15",
+  "fechaLlegada": "2024-01-25",
+  "estado": "Pendiente",
+  "cupos": 5,
+  "costoEstimado": 1500.00,
+  "cupoDisponible": 3,
+  "total": 7500.00,
+  "totalPorPersona": 1500.00,
+  "descripcionVehiculo": "Toyota Corolla"
+}
+
+###
+
+### Actualizar un viaje existente (completo)
+PUT http://localhost:3000/api/viajes/1
+Content-Type: application/json
+
+{
+  "fechaSalida": "2024-02-01",
+  "fechaLlegada": "2024-02-10",
+  "estado": "Confirmado",
+  "cupos": 6,
+  "costoEstimado": 1800.00,
+  "cupoDisponible": 4,
+  "total": 10800.00,
+  "totalPorPersona": 1800.00,
+  "descripcionVehiculo": "Honda Civic"
+}
+
+###
+
+### Actualizar parcialmente un viaje
+PATCH http://localhost:3000/api/viajes/1
+Content-Type: application/json
+
+{
+  "estado": "En progreso",
+  "costoEstimado": 2000.00
+}
+
+###
+
+### Eliminar un viaje
+DELETE http://localhost:3000/api/viajes/1
+
+###
+
