@@ -9,11 +9,11 @@ import {
   remove,
 } from "./viaje.controler.js";
 
-export const solicitudRouter = Router();
+export const viajeRouter = Router();
 
-solicitudRouter.get("/", findAll); // Ruta para obtener una lista de solicitudes
-solicitudRouter.get("/:id", findOne); // Ruta para obtener una solicitud por id
-solicitudRouter.post("/", sanitizedInput, add); // Ruta para agregar una solicitud
-solicitudRouter.put("/:id", sanitizedInput, update); // Ruta para modificar una solicitud
-solicitudRouter.patch("/:id", sanitizedInput, update); // Ruta para modificar una solicitud
-solicitudRouter.delete("/:id", remove); // Ruta para eliminar una solicitud
+viajeRouter.get("/", findAll); // Ruta para obtener una lista de solicitudes
+viajeRouter.get("/:id", findOne); // Ruta para obtener una solicitud por id
+viajeRouter.post("/", sanitizedInput, add); // Ruta para agregar una solicitud
+viajeRouter.put("/:id", sanitizedInput, update); // Ruta para modificar una solicitud
+viajeRouter.patch("/:id", sanitizedInput, update); // Ruta para modificar una solicitud
+viajeRouter.delete("/:id", remove); // Ruta para eliminar una solicitud
