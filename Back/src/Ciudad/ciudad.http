@@ -1,10 +1,10 @@
-### Obtener una lista de personajes
+### Obtener una lista de ciudades
 GET http://localhost:3000/api/ciudades
 
-### Obtener un personaje por id
+### Obtener una ciudad por id
 GET http://localhost:3000/api/ciudades/49417e44-dde4-4e17-92cc-657274948182
 
-### Crear un nuevo personaje
+### Crear una nueva ciudad
 POST http://localhost:3000/api/ciudades
 Content-Type: application/json
 
@@ -16,7 +16,7 @@ Content-Type: application/json
 }
 
 
-### Modificar un personaje (PUT/PATCH)
+### Modificar una ciudad (PUT/PATCH)
 ### PUT --> debe ser idempotente, si se ejecuta varias veces el resultado debe ser el mismo
 ### Se usa para modificaciones completas
 ### Para poder ser idempotente se deben enviar todos los elementos que pueden ser modificados
@@ -34,7 +34,7 @@ Content-Type: application/json
 }
 
 
-### Modificar algunos datos de un personaje
+### Modificar algunos datos de una ciudad
 PATCH http://localhost:3000/api/ciudades/49417e44-dde4-4e17-92cc-657274948182
 Content-Type: application/json
 
@@ -43,5 +43,5 @@ Content-Type: application/json
   "provincia": "Santa Fe"
 }
 
-### Borrar un personaje
+### Borrar una ciudad
 DELETE http://localhost:3000/api/ciudades/49417e44-dde4-4e17-92cc-657274948182
