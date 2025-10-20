@@ -53,9 +53,12 @@ async function add(req: Request, res: Response) {
 }
 
 // Función para modificar los datos de un pasajero
-/*function update(req: Request, res: Response) {
+async function update(req: Request, res: Response) {
   req.body.sanitizedInput.id = req.params.id;
-  const pasajero = repository.update(req.body.sanitizedInput);
+  const pasajero = await repository.update(
+    req.body.sanitizedInput.id,
+    req.body.sanitizedInput
+  );
   if (pasajero) {
     return res.status(200).send({
       message: 'Pasajero modified successfully',
@@ -65,7 +68,6 @@ async function add(req: Request, res: Response) {
     return res.status(404).send({ message: 'Pasajero not found' });
   }
 }
-*/
 
 // Función para eliminar un pasajero
 function remove(req: Request, res: Response) {
@@ -79,4 +81,4 @@ function remove(req: Request, res: Response) {
   }
 }
 
-export { sanitizedInput, findAll, findOne, add, remove };
+export { sanitizedInput, findAll, findOne, add, update, remove };

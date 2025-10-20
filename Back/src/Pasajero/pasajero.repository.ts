@@ -44,9 +44,28 @@ export class PasajeroRepository implements Repository<Pasajero> {
   // Funcion para modificar datos
   public async update(
     id: string,
-    item: Pasajero
+    pasajeroInput: Pasajero
   ): Promise<Pasajero | undefined> {
-    throw new Error('not implemented');
+    const pasajeroId = Number.parseInt(id);
+    if (isNaN(pasajeroId)) {
+      // id inválido, no se puede actualizar
+      return undefined;
+    }
+    // No actualizar el id si viene en el body
+    const { id: _omit, ...pasajeroRow } = pasajeroInput as Pasajero & {
+      id?: number;
+    };
+
+    const [result] = await pool.query<ResultSetHeader>(
+      'update pasajero set ? where id = ?',
+      [pasajeroRow, pasajeroId]
+    );
+
+    if (result.affectedRows === 0) {
+      return undefined; // no existe ese id
+    }
+
+    return { ...pasajeroInput, id: pasajeroId } as Pasajero;
   }
 
   // Funcion para borrar pasajeros
