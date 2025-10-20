@@ -1,51 +1,57 @@
 import { Repository } from '../shared/repository.js';
 import { Pasajero } from './pasajero.entity.js';
+import { pool } from '../shared/db/connections.mysql.js';
+import { RowDataPacket } from 'mysql2';
 
-const pasajeros = [
+/*const pasajeros = [
   new Pasajero(
     'Abril',
     'Abonizio',
     '3402549638',
     'San Nicolas 207 bis',
     'abri@gmail',
-    [5, 3, 7, 9, 2, 8],
     'd7b8c1a4-3b61-4c9a-bb8b-2b9a1f4de3c6'
   ),
 ];
+*/
 
 export class PasajeroRepository implements Repository<Pasajero> {
-  public findAll(): Pasajero[] | undefined {
-    return pasajeros;
-  }
-  public findOne(item: { id: string }): Pasajero | undefined {
-    return pasajeros.find((pasajero) => pasajero.id === item.id);
+  public async findAll(): Promise<Pasajero[] | undefined> {
+    const [pasajeros] = await pool.query('select * from pasajero'); // VER QUE ES UN ROWDATAPACKET que es lo que va a tener adentro pasajero
+    return pasajeros as Pasajero[];
   }
 
-  public add(item: Pasajero): Pasajero | undefined {
-    pasajeros.push(item);
-    return item;
-  }
+  public async findOne(item: { id: string }): Promise<Pasajero | undefined> {
+    const id = Number.parseInt(item.id);
 
-  public update(item: Pasajero): Pasajero | undefined {
-    const pasajeroIdx = pasajeros.findIndex(
-      (pasajero) => pasajero.id === item.id
+    // Validar que el id sea un número válido
+    if (isNaN(id)) {
+      return undefined;
+    }
+
+    const [pasajeros] = await pool.query<RowDataPacket[]>(
+      'select * from pasajero where id = ?',
+      [id]
     );
-    if (pasajeroIdx !== -1) {
-      // Merge directo en la instancia existente
-      const existing = pasajeros[pasajeroIdx];
-      Object.assign(existing, item);
-      return existing;
+    if (pasajeros.length === 0) {
+      return undefined;
     }
-    return undefined;
+    const pasajero = pasajeros[0] as Pasajero;
+    return pasajero;
   }
 
-  public delete(item: { id: string }): Pasajero | undefined {
-    const pasajeroIdx = pasajeros.findIndex((p) => p.id === item.id);
-    if (pasajeroIdx !== -1) {
-      const deletedPasajero = pasajeros[pasajeroIdx];
-      pasajeros.splice(pasajeroIdx, 1);
-      return deletedPasajero;
-    }
-    return undefined;
+  public async add(item: Pasajero): Promise<Pasajero | undefined> {
+    throw new Error('not implemented');
+  }
+
+  public async update(
+    id: string,
+    item: Pasajero
+  ): Promise<Pasajero | undefined> {
+    throw new Error('not implemented');
+  }
+
+  public async delete(item: { id: string }): Promise<Pasajero | undefined> {
+    throw new Error('not implemented');
   }
 }

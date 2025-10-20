@@ -11,6 +11,7 @@ const ciudades = [
   ),
 ];
 
+/*
 export class CiudadRepository implements Repository<Ciudad> {
   public findAll(): Ciudad[] | undefined {
     return ciudades;
@@ -46,3 +47,4 @@ export class CiudadRepository implements Repository<Ciudad> {
     return undefined;
   }
 }
+*/

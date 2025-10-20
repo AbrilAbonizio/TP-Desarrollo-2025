@@ -23,13 +23,13 @@ function sanitizedInput(req: Request, res: Response, next: NextFunction) {
 }
 
 // Función para obtener una lista de pasajeros
-function findAll(req: Request, res: Response) {
-  res.json({ data: repository.findAll() });
+async function findAll(req: Request, res: Response) {
+  res.json({ data: await repository.findAll() });
 }
 
 // Función para obtener un pasajero por id
-function findOne(req: Request, res: Response) {
-  const pasajero = repository.findOne({ id: req.params.id });
+async function findOne(req: Request, res: Response) {
+  const pasajero = await repository.findOne({ id: req.params.id });
   if (!pasajero) {
     return res.status(404).send({ message: 'Pasajero not found' });
   }
@@ -53,7 +53,7 @@ function add(req: Request, res: Response) {
 }
 
 // Función para modificar los datos de un pasajero
-function update(req: Request, res: Response) {
+/*function update(req: Request, res: Response) {
   req.body.sanitizedInput.id = req.params.id;
   const pasajero = repository.update(req.body.sanitizedInput);
   if (pasajero) {
@@ -65,6 +65,7 @@ function update(req: Request, res: Response) {
     return res.status(404).send({ message: 'Pasajero not found' });
   }
 }
+*/
 
 // Función para eliminar un pasajero
 function remove(req: Request, res: Response) {
@@ -78,4 +79,4 @@ function remove(req: Request, res: Response) {
   }
 }
 
-export { sanitizedInput, findAll, findOne, add, update, remove };
+export { sanitizedInput, findAll, findOne, add, remove };

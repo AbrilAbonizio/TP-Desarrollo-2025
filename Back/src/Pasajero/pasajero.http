@@ -2,18 +2,18 @@
 GET http://localhost:3000/api/pasajeros
 
 ### Obtener un pasajero por id
-GET http://localhost:3000/api/pasajeros/d7b8c1a4-3b61-4c9a-bb8b-2b9a1f4de3c6
+GET http://localhost:3000/api/pasajeros/1
 
 ### Crear un nuevo pasajero
 POST http://localhost:3000/api/pasajeros
 Content-Type: application/json
 
 {
-  "nombre": "Marcos",
-  "apellido": "Mestre",
+  "nombre": "Jorgelina",
+  "apellido": "Lannutti",
   "telefono": "341345656",
-  "direccion": "San Lorenzo 1686",
-  "email": "marcos@gmail.com"
+  "direccion": "Rivadavia 234",
+  "email": "jorgelina@gmail.com"
 }
 
 

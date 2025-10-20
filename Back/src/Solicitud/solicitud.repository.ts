@@ -1,6 +1,7 @@
 import { Repository } from '../shared/repository.js';
 import { Solicitud } from './solicitud.entity.js';
 
+/*
 const solicitudes = [
   new Solicitud(
     'Pendiente',
@@ -46,3 +47,4 @@ export class SolicitudRepository implements Repository<Solicitud> {
     return undefined;
   }
 }
+*/
