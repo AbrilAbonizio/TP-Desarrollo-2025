@@ -65,11 +65,24 @@ export class PasajeroRepository implements Repository<Pasajero> {
       return undefined; // no existe ese id
     }
 
-    return { ...pasajeroInput, id: pasajeroId } as Pasajero;
+    return await this.findOne({ id });
   }
 
   // Funcion para borrar pasajeros
   public async delete(item: { id: string }): Promise<Pasajero | undefined> {
-    throw new Error('not implemented');
+    try {
+      const pasajeroToDelete = await this.findOne(item);
+      const pasajeroId = Number.parseInt(item.id);
+      await pool.query('delete from solicitud where idPasajero = ? ', [
+        pasajeroId,
+      ]);
+      await pool.query('delete from viaje where idOrganizador = ? ', [
+        pasajeroId,
+      ]);
+      await pool.query('delete from pasajero where id = ?', [pasajeroId]);
+      return pasajeroToDelete;
+    } catch (error: any) {
+      throw new Error('unable to delete pasajero');
+    }
   }
 }

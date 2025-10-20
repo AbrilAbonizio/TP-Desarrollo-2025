@@ -70,8 +70,8 @@ async function update(req: Request, res: Response) {
 }
 
 // Función para eliminar un pasajero
-function remove(req: Request, res: Response) {
-  const pasajero = repository.delete({ id: req.params.id });
+async function remove(req: Request, res: Response) {
+  const pasajero = await repository.delete({ id: req.params.id });
   if (pasajero) {
     res
       .status(200)

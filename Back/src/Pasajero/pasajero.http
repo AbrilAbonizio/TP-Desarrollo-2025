@@ -28,7 +28,7 @@ PUT http://localhost:3000/api/pasajeros/1
 Content-Type: application/json
 
 {
-  "nombre": "Nerea",
+  "nombre": "Eugenia",
   "apellido": "Abonizio",
   "telefono": "3402549638",
   "direccion": "San Nicolas 207 bis",
@@ -37,14 +37,14 @@ Content-Type: application/json
 
 
 ### Modificar algunos datos de un pasajero
-PATCH http://localhost:3000/api/pasajeros/2
+PATCH http://localhost:3000/api/pasajeros/1
 Content-Type: application/json
 
 {
- "nombre": "Nerea",
+ "nombre": "Abril",
   "direccion": "Rivadavia 234",
   "email": "abril.abonizio@gmail"
 }
 
 ### Borrar un pasajero
-DELETE http://localhost:3000/api/pasajeros/d7b8c1a4-3b61-4c9a-bb8b-2b9a1f4de3c6
+DELETE http://localhost:3000/api/pasajeros/1
