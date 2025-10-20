@@ -37,7 +37,7 @@ async function findOne(req: Request, res: Response) {
 }
 
 // Función para agregar un nuevo pasajero
-function add(req: Request, res: Response) {
+async function add(req: Request, res: Response) {
   const input = req.body.sanitizedInput;
 
   const pasajeroInput = new Pasajero(
@@ -48,7 +48,7 @@ function add(req: Request, res: Response) {
     input.email
   );
 
-  const pasajero = repository.add(pasajeroInput);
+  const pasajero = await repository.add(pasajeroInput);
   return res.status(201).send({ message: 'Pasajero created', data: pasajero });
 }
 

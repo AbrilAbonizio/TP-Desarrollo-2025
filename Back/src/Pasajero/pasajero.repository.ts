@@ -1,26 +1,16 @@
 import { Repository } from '../shared/repository.js';
 import { Pasajero } from './pasajero.entity.js';
 import { pool } from '../shared/db/connections.mysql.js';
-import { RowDataPacket } from 'mysql2';
-
-/*const pasajeros = [
-  new Pasajero(
-    'Abril',
-    'Abonizio',
-    '3402549638',
-    'San Nicolas 207 bis',
-    'abri@gmail',
-    'd7b8c1a4-3b61-4c9a-bb8b-2b9a1f4de3c6'
-  ),
-];
-*/
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
 export class PasajeroRepository implements Repository<Pasajero> {
+  // Funcion para encontrar todos los pasajeros
   public async findAll(): Promise<Pasajero[] | undefined> {
     const [pasajeros] = await pool.query('select * from pasajero'); // VER QUE ES UN ROWDATAPACKET que es lo que va a tener adentro pasajero
     return pasajeros as Pasajero[];
   }
 
+  // Funcion para encontrar un pasajero
   public async findOne(item: { id: string }): Promise<Pasajero | undefined> {
     const id = Number.parseInt(item.id);
 
@@ -40,10 +30,18 @@ export class PasajeroRepository implements Repository<Pasajero> {
     return pasajero;
   }
 
-  public async add(item: Pasajero): Promise<Pasajero | undefined> {
-    throw new Error('not implemented');
+  // Funcion para agregar datos
+  public async add(pasajeroInput: Pasajero): Promise<Pasajero | undefined> {
+    const { id, ...pasajeroRow } = pasajeroInput;
+    const [result] = await pool.query<ResultSetHeader>(
+      'insert into pasajero set ?',
+      [pasajeroRow]
+    );
+    pasajeroInput.id = result.insertId;
+    return pasajeroInput;
   }
 
+  // Funcion para modificar datos
   public async update(
     id: string,
     item: Pasajero
@@ -51,6 +49,7 @@ export class PasajeroRepository implements Repository<Pasajero> {
     throw new Error('not implemented');
   }
 
+  // Funcion para borrar pasajeros
   public async delete(item: { id: string }): Promise<Pasajero | undefined> {
     throw new Error('not implemented');
   }
