@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { PasajeroRepository } from './pasajero.repository.js';
 import { Pasajero } from './pasajero.entity.js';
 
-const repository = new PasajeroRepository(); // Crea una instancia de la clase CiudadRepository
+const repository = new PasajeroRepository(); // Crea una instancia de la clase PasajeroRepository
 
 // Middleware para validar que no se ingresen datos extras
 function sanitizedInput(req: Request, res: Response, next: NextFunction) {
@@ -73,9 +73,7 @@ async function update(req: Request, res: Response) {
 async function remove(req: Request, res: Response) {
   const pasajero = await repository.delete({ id: req.params.id });
   if (pasajero) {
-    res
-      .status(200)
-      .send({ message: 'Pasajero deleted successfully', data: pasajero });
+    res.status(200).send({ message: 'Pasajero deleted successfully', data: pasajero });
   } else {
     res.status(404).send({ message: 'Pasajero not found' });
   }

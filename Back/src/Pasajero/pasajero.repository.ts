@@ -42,10 +42,7 @@ export class PasajeroRepository implements Repository<Pasajero> {
   }
 
   // Funcion para modificar datos
-  public async update(
-    id: string,
-    pasajeroInput: Pasajero
-  ): Promise<Pasajero | undefined> {
+  public async update(id: string, pasajeroInput: Pasajero): Promise<Pasajero | undefined> {
     const pasajeroId = Number.parseInt(id);
     if (isNaN(pasajeroId)) {
       // id inválido, no se puede actualizar
@@ -73,12 +70,8 @@ export class PasajeroRepository implements Repository<Pasajero> {
     try {
       const pasajeroToDelete = await this.findOne(item);
       const pasajeroId = Number.parseInt(item.id);
-      await pool.query('delete from solicitud where idPasajero = ? ', [
-        pasajeroId,
-      ]);
-      await pool.query('delete from viaje where idOrganizador = ? ', [
-        pasajeroId,
-      ]);
+      await pool.query('delete from solicitud where idPasajero = ? ', [pasajeroId]);
+      await pool.query('delete from viaje where idOrganizador = ? ', [pasajeroId]);
       await pool.query('delete from pasajero where id = ?', [pasajeroId]);
       return pasajeroToDelete;
     } catch (error: any) {
