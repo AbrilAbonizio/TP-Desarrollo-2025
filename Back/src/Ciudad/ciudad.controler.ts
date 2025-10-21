@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+/*import { Request, Response, NextFunction } from 'express';
 import { CiudadRepository } from './ciudad.repository.js';
 import { Ciudad } from './ciudad.entity.js';
 
@@ -77,3 +77,4 @@ function remove(req: Request, res: Response) {
 }
 
 export { sanitizedInput, findAll, findOne, add, update, remove };
+*/

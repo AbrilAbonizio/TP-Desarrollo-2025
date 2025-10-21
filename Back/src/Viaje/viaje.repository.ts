@@ -1,6 +1,7 @@
-import { Repository } from "../shared/repository.js";
-import { Viaje } from "./viaje.entity.js";
+import { Repository } from '../shared/repository.js';
+import { Viaje } from './viaje.entity.js';
 
+/*
 const viajes = [
   new Viaje(
     1,
@@ -75,3 +76,4 @@ export class ViajeRepository implements Repository<Viaje> {
     return undefined;
   }
 }
+*/

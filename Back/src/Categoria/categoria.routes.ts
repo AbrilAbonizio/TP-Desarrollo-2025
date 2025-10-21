@@ -1,4 +1,4 @@
-import { Router } from "express";
+/*import { Router } from "express";
 import {
   sanitizedInput,
   findAll,
@@ -16,3 +16,4 @@ categoriaRouter.post("/", sanitizedInput, add); // Ruta para agregar una categor
 categoriaRouter.put("/:id", sanitizedInput, update); // Ruta para modificar una categoria
 categoriaRouter.patch("/:id", sanitizedInput, update); // Ruta para modificar una categoria
 categoriaRouter.delete("/:id", remove); // Ruta para eliminar una categoria
+*/

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+/*import { Router } from 'express';
 import {
   sanitizedInput,
   findAll,
@@ -16,3 +16,4 @@ ciudadRouter.post('/', sanitizedInput, add); // Ruta para agregar una ciudad
 ciudadRouter.put('/:id', sanitizedInput, update); // Ruta para modificar una ciudad
 ciudadRouter.patch('/:id', sanitizedInput, update); // Ruta para modificar una ciudad
 ciudadRouter.delete('/:id', remove); // Ruta para eliminar una ciudad
+*/
