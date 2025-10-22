@@ -1,4 +1,4 @@
-/*import { Router } from 'express';
+import { Router } from 'express';
 import {
   sanitizedInput,
   findAll,
@@ -16,4 +16,3 @@ solicitudRouter.post('/', sanitizedInput, add); // Ruta para agregar una solicit
 solicitudRouter.put('/:id', sanitizedInput, update); // Ruta para modificar una solicitud
 solicitudRouter.patch('/:id', sanitizedInput, update); // Ruta para modificar una solicitud
 solicitudRouter.delete('/:id', remove); // Ruta para eliminar una solicituds
-*/
