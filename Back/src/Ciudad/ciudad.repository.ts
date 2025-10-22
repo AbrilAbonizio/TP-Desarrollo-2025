@@ -1,4 +1,4 @@
-import { Repository } from '../shared/repository.js';
+/*import { Repository } from '../shared/repository.js';
 import { Ciudad } from './ciudad.entity.js';
 import { pool } from '../shared/db/connections.mysql.js';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
@@ -71,3 +71,4 @@ export class CiudadRepository implements Repository<Ciudad> {
 
 }
 
+*/

@@ -1,11 +1,11 @@
-import { Repository } from '../shared/repository.js';
+/*import { Repository } from '../shared/repository.js';
 import { Categoria } from './categoria.entity.js';
 
 const categorias = [
   new Categoria('Sin Menores', '49417e44-dde4-4e17-92cc-657274948182'),
 ];
 
-/*
+
 export class CategoriaRepository implements Repository<Categoria> {
   public findAll(): Categoria[] | undefined {
     return categorias;

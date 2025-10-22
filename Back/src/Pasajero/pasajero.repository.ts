@@ -1,7 +1,5 @@
-import { Repository } from '../shared/repository.js';
+/*import { Repository } from '../shared/repository.js';
 import { Pasajero } from './pasajero.entity.js';
-import { pool } from '../shared/db/connections.mysql.js';
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
 export class PasajeroRepository implements Repository<Pasajero> {
   // Funcion para encontrar todos los pasajeros
@@ -79,3 +77,4 @@ export class PasajeroRepository implements Repository<Pasajero> {
     }
   }
 }
+*/

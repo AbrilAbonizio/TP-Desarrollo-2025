@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { PasajeroRepository } from './pasajero.repository.js';
 import { Pasajero } from './pasajero.entity.js';
+import {orm} from '../shared/orm.js';
+import { AnyCnameRecord } from 'node:dns';
 
-const repository = new PasajeroRepository(); // Crea una instancia de la clase PasajeroRepository
+const em = orm.em;
 
 // Middleware para validar que no se ingresen datos extras
 function sanitizedInput(req: Request, res: Response, next: NextFunction) {
@@ -24,59 +25,73 @@ function sanitizedInput(req: Request, res: Response, next: NextFunction) {
 
 // Función para obtener una lista de pasajeros
 async function findAll(req: Request, res: Response) {
-  res.json({ data: await repository.findAll() });
+  try{
+    const pasajeros = await em.find(Pasajero, {})
+    res.status(200).json({message: 'found all pasajeros', data: pasajeros})
+  }
+  catch(error: any){
+    return res.status(500).send({ message: error.message });
+  }
+
 }
 
 // Función para obtener un pasajero por id
 async function findOne(req: Request, res: Response) {
-  const pasajero = await repository.findOne({ id: req.params.id });
-  if (!pasajero) {
-    return res.status(404).send({ message: 'Pasajero not found' });
+  try{
+    const id = Number.parseInt(req.params.id);
+    const pasajero = await em.findOneOrFail(Pasajero, {id})
+    try{
+      res.status(200).json({message: 'found pasajero', data: pasajero})
+    }
+    catch(error: any){
+      return res.status(500).send({ message: error.message});
+    }
   }
-  return res.json(pasajero);
+  catch(error: any){
+    return res.status(500).send({ message: error.message});
+  }
 }
 
 // Función para agregar un nuevo pasajero
 async function add(req: Request, res: Response) {
-  const input = req.body.sanitizedInput;
-
-  const pasajeroInput = new Pasajero(
-    input.nombre,
-    input.apellido,
-    input.telefono,
-    input.direccion,
-    input.email
-  );
-
-  const pasajero = await repository.add(pasajeroInput);
-  return res.status(201).send({ message: 'Pasajero created', data: pasajero });
+  try{
+    // Es una operacion sincronica que no necesita acceder a la base de datos
+    const pasajero = em.create(Pasajero, req.body); // FALTA SANITIZAR EL BODY 
+    await em.flush(); //commit hacia la base de datos, SI ES ASINCRONICA
+    res.status(201).json({message: 'Pasajero created', data: pasajero})
+  }
+  catch(error: any){
+    return res.status(500).send({ message: error.message});
+  }
 }
 
 // Función para modificar los datos de un pasajero
 async function update(req: Request, res: Response) {
-  req.body.sanitizedInput.id = req.params.id;
-  const pasajero = await repository.update(
-    req.body.sanitizedInput.id,
-    req.body.sanitizedInput
-  );
-  if (pasajero) {
-    return res.status(200).send({
-      message: 'Pasajero modified successfully',
-      data: pasajero,
-    });
-  } else {
-    return res.status(404).send({ message: 'Pasajero not found' });
+  try{
+    const id = Number.parseInt(req.params.id);
+    const pasajero = em.getReference(Pasajero, id); //No siempre es conveniente
+    em.assign(Pasajero, req.body); // FALTA SANITIZAR EL BODY
+    await em.flush();
+    res.status(200).json({message: 'Pasajero updated', data: pasajero})
+    
+  }
+  catch(error: any){
+    return res.status(500).send({ message: error.message});
   }
 }
 
 // Función para eliminar un pasajero
 async function remove(req: Request, res: Response) {
-  const pasajero = await repository.delete({ id: req.params.id });
-  if (pasajero) {
-    res.status(200).send({ message: 'Pasajero deleted successfully', data: pasajero });
-  } else {
-    res.status(404).send({ message: 'Pasajero not found' });
+  try{
+    const id = Number.parseInt(req.params.id);
+    const pasajero = em.getReference(Pasajero, id); 
+    await em.removeAndFlush(pasajero);
+    res.status(204).json({data: pasajero})
   }
+  catch(error: any){
+    return res.status(500).send({ message: error.message});
+  }
+
 }
 
 export { sanitizedInput, findAll, findOne, add, update, remove };

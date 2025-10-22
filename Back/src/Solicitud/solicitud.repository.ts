@@ -1,4 +1,4 @@
-import { Repository } from '../shared/repository.js';
+/*import { Repository } from '../shared/repository.js';
 import { Solicitud } from './solicitud.entity.js';
 import { pool } from '../shared/db/connections.mysql.js';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
@@ -87,3 +87,4 @@ export class SolicitudRepository implements Repository<Solicitud> {
   }
 }
 
+*/

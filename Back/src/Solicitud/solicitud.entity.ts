@@ -1,4 +1,4 @@
-import { Entity, OneToMany, PrimaryKey, Property , Cascade, Collection, ManyToOne} from '@mikro-orm/core';
+import { Entity, OneToMany, PrimaryKey, Property , Cascade, ManyToOne, Rel} from '@mikro-orm/core';
 import { Pasajero } from '../Pasajero/pasajero.entity.js';
 import { Viaje } from '../Viaje/viaje.entity.js';
 
@@ -11,12 +11,11 @@ export class Solicitud {
   @Property()
   fechaSolicitud!: Date;
 
-  // Campos opcionales para enriquecer la respuesta (no necesariamente persistidos)
-  @PrimaryKey() @ManyToOne(() => Pasajero, {nullable: false})
-  pasajero!: Pasajero;
+  @ManyToOne(() => Pasajero, { primary: true })
+  pasajero!: Rel<Pasajero>;
 
-  @PrimaryKey() @ManyToOne(() => Viaje, {nullable: false})
-  viaje!: Viaje;
+  @ManyToOne(() => Viaje, { primary: true })
+  viaje!: Rel<Viaje>;
 }
 
 
