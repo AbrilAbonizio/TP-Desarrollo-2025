@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+/*import { Request, Response, NextFunction } from "express";
 import { CategoriaRepository } from "./categoria.repository.js";
 import { Categoria } from "./categoria.entity.js";
 
@@ -71,3 +71,4 @@ function remove(req: Request, res: Response) {
 }
 
 export { sanitizedInput, findAll, findOne, add, update, remove };
+*/

@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
+/*import { Request, Response, NextFunction } from 'express';
 import { ViajeRepository } from "./viaje.repository.js";
-import { Viaje } from "./viaje.entity.js";
+import { Viaje } from './viaje.entity.js';
 
 const repository = new ViajeRepository(); // Crea una instancia de la clase ViajeRepository
 
@@ -35,7 +35,7 @@ function findAll(req: Request, res: Response) {
 function findOne(req: Request, res: Response) {
   const viaje = repository.findOne({ id: req.params.id });
   if (!viaje) {
-    return res.status(404).send({ message: "Viaje not found" });
+    return res.status(404).send({ message: 'Viaje not found' });
   }
   return res.json(viaje);
 }
@@ -56,7 +56,7 @@ function add(req: Request, res: Response) {
     input.descripcionVehiculo
   );
   const viaje = repository.add(viajeInput);
-  return res.status(201).send({ message: "Viaje created", data: viaje });
+  return res.status(201).send({ message: 'Viaje created', data: viaje });
 }
 
 // Función para modificar los datos de un viaje
@@ -77,12 +77,12 @@ function update(req: Request, res: Response) {
 
   if (viaje) {
     return res.status(200).send({
-      message: "Viaje modified successfully",
+      message: 'Viaje modified successfully',
 
       data: viaje,
     });
   } else {
-    return res.status(404).send({ message: "Viaje not found" });
+    return res.status(404).send({ message: 'Viaje not found' });
   }
 }
 
@@ -92,10 +92,11 @@ function remove(req: Request, res: Response) {
   if (viaje) {
     res
       .status(200)
-      .send({ message: "Viaje deleted successfully", data: viaje });
+      .send({ message: 'Viaje deleted successfully', data: viaje });
   } else {
-    res.status(404).send({ message: "Viaje not found" });
+    res.status(404).send({ message: 'Viaje not found' });
   }
 }
 
 export { sanitizedInput, findAll, findOne, add, update, remove };
+*/

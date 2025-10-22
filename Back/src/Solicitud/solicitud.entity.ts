@@ -4,6 +4,7 @@ export class Solicitud {
   constructor(
     public estado: string,
     public fechaSolicitud: Date,
-    public id = crypto.randomUUID()
+    public idPasajero: string,
+    public idViaje: string
   ) {}
 }
