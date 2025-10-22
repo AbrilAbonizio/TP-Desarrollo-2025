@@ -2,17 +2,17 @@
 GET http://localhost:3000/api/ciudades
 
 ### Obtener una ciudad por id
-GET http://localhost:3000/api/ciudades/49417e44-dde4-4e17-92cc-657274948182
+GET http://localhost:3000/api/ciudades/5
 
 ### Crear una nueva ciudad
 POST http://localhost:3000/api/ciudades
 Content-Type: application/json
 
 {
-  "nombre": "Rosario",
-  "provincia": "Santa Fe",
-  "latitud": 65,
-  "longitud": 78
+  "nombre": "San Miguel de Tucuman",
+  "provincia": "Tucuman",
+  "latitud": -87,
+  "longitud": 90
 }
 
 
@@ -23,7 +23,7 @@ Content-Type: application/json
 ### PATCH --> puede ser idempotente pero no es un requisito
 ### Se usa para modificaciones parciales, solo algunos atributos
 
-PUT http://localhost:3000/api/ciudades/49417e44-dde4-4e17-92cc-657274948182
+PUT http://localhost:3000/api/ciudades/6
 Content-Type: application/json
 
 {
@@ -35,13 +35,13 @@ Content-Type: application/json
 
 
 ### Modificar algunos datos de una ciudad
-PATCH http://localhost:3000/api/ciudades/49417e44-dde4-4e17-92cc-657274948182
+PATCH http://localhost:3000/api/ciudades/6
 Content-Type: application/json
 
 {
-  "nombre": "Posta de San Martin",
+  "nombre": "Arroyo Seco",
   "provincia": "Santa Fe"
 }
 
 ### Borrar una ciudad
-DELETE http://localhost:3000/api/ciudades/49417e44-dde4-4e17-92cc-657274948182
+DELETE http://localhost:3000/api/ciudades/7

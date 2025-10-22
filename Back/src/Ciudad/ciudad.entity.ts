@@ -6,6 +6,6 @@ export class Ciudad {
     public provincia: string,
     public latitud: number,
     public longitud: number,
-    public id = crypto.randomUUID()
+    public id ?: number
   ) {}
 }
