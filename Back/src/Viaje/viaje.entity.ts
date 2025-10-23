@@ -1,21 +1,54 @@
+import {
+  Entity,
+  ManyToMany,
+  PrimaryKey,
+  Property,
+  Cascade,
+  Collection,
+  ManyToOne,
+  Rel,
+  OneToMany,
+} from "@mikro-orm/core";
+import { Categoria } from "../Categoria/categoria.entity.js";
 import { Ciudad } from "../Ciudad/ciudad.entity.js";
 import { Solicitud } from "../Solicitud/solicitud.entity.js";
+import { Pasajero } from "../Pasajero/pasajero.entity.js";
 
+@Entity()
 export class Viaje {
-  constructor(
-    public id: number,
-    public ciudad: Ciudad, // Ciudad destino
-    // public idCiudadOrigen: number   --> lo podriamos agregar
-    public idOrganizador: number,
-    public fechaSalida: Date,
-    public fechaLlegada: Date,
-    public estado: string,
-    public cupos: number,
-    public costoEstimado: number,
-    //public cupoDisponible: number, como es calculado no se guarda dentro de la entidad
-    //public total: number, se calcula mas adelante con los gastos asociados
-    //public totalPorPersona: number,
-    public descVehiculo: string,
-    public solicitudes: Solicitud[],
-  ) {}
+  @PrimaryKey({ nullable: false })
+  id!: number;
+
+  @Property({ nullable: false })
+  nombre!: string;
+
+  @Property({ nullable: false })
+  provincia!: string;
+
+  @Property({ nullable: false })
+  latitud!: number;
+
+  @Property({ nullable: false })
+  longitud!: number;
+
+  // CATEGORIAS MUCHJAS A MUCHAS
+  @ManyToMany(() => Categoria, (categoria) => categoria.viajes, {
+    cascade: [Cascade.ALL],
+    owner: true,
+  })
+  categorias = new Collection<Categoria>(this);
+
+  // MUCHOS VIAJES A UNA CIUDAD, UNA CIUDAD TIENE MUCHOS VIAJES
+  @ManyToOne(() => Ciudad, { nullable: false })
+  ciudad!: Rel<Ciudad>;
+
+  // UN VIAJE TIENE MUCHAS SOLICITUDES
+  @OneToMany(() => Solicitud, (solicitud) => solicitud.viaje, {
+    cascade: [Cascade.ALL],
+  })
+  solicitudes = new Collection<Solicitud>(this);
+
+  // UN VIAJE TIENE UN ORGANIZADOR (PASAJERO)
+  @ManyToOne(() => Pasajero, { nullable: false })
+  organizador!: Rel<Pasajero>;
 }
