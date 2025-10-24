@@ -20,16 +20,22 @@ export class Viaje {
   id!: number;
 
   @Property({ nullable: false })
-  nombre!: string;
+  fechaSalida!: Date;
 
   @Property({ nullable: false })
-  provincia!: string;
+  fechaLlegada!: Date;
 
   @Property({ nullable: false })
-  latitud!: number;
+  estado!: string;
 
   @Property({ nullable: false })
-  longitud!: number;
+  cupos!: number;
+
+  @Property({ nullable: false })
+  costoEstimado!: number;
+
+  @Property({ nullable: false })
+  descVehiculo!: string;
 
   // CATEGORIAS MUCHJAS A MUCHAS
   @ManyToMany(() => Categoria, (categoria) => categoria.viajes, {
