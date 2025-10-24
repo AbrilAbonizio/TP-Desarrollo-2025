@@ -37,15 +37,13 @@ async function findAll(req: Request, res: Response) {
 
 // Función para obtener un pasajero por id
 async function findOne(req: Request, res: Response) {
-  try{
     const id = Number.parseInt(req.params.id);
+    if (isNaN(id)) {
+    return res.status(400).json({ message: 'ID inválido' });
+  }
+  try{
     const pasajero = await em.findOneOrFail(Pasajero, {id})
-    try{
-      res.status(200).json({message: 'found pasajero', data: pasajero})
-    }
-    catch(error: any){
-      return res.status(500).send({ message: error.message});
-    }
+    res.status(200).json({message: 'found pasajero', data: pasajero})
   }
   catch(error: any){
     return res.status(500).send({ message: error.message});
@@ -70,7 +68,7 @@ async function update(req: Request, res: Response) {
   try{
     const id = Number.parseInt(req.params.id);
     const pasajero = em.getReference(Pasajero, id); //No siempre es conveniente
-    em.assign(Pasajero, req.body); // FALTA SANITIZAR EL BODY
+    em.assign(pasajero, req.body); // FALTA SANITIZAR EL BODY
     await em.flush();
     res.status(200).json({message: 'Pasajero updated', data: pasajero})
     
@@ -86,7 +84,7 @@ async function remove(req: Request, res: Response) {
     const id = Number.parseInt(req.params.id);
     const pasajero = em.getReference(Pasajero, id); 
     await em.removeAndFlush(pasajero);
-    res.status(204).json({data: pasajero})
+    res.status(204).json({message: 'Pasajero deleted successfully', data: pasajero})
   }
   catch(error: any){
     return res.status(500).send({ message: error.message});

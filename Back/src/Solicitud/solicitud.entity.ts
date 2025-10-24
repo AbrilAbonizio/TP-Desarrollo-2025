@@ -5,17 +5,17 @@ import { Viaje } from '../Viaje/viaje.entity.js';
 @Entity()
 export class Solicitud {
 
-  @Property({ nullable: false })
-  estado!: string;
+  @ManyToOne(() => Pasajero, { primary: true, fieldName: 'idPasajero' })
+  pasajero!: Rel<Pasajero>;
+
+  @ManyToOne(() => Viaje, { primary: true, fieldName: 'idViaje' })
+  viaje!: Rel<Viaje>;
 
   @Property()
   fechaSolicitud!: Date;
 
-  @ManyToOne(() => Pasajero, { primary: true })
-  pasajero!: Rel<Pasajero>;
-
-  @ManyToOne(() => Viaje, { primary: true })
-  viaje!: Rel<Viaje>;
+  @Property({ nullable: false })
+  estado!: string;
 }
 
 

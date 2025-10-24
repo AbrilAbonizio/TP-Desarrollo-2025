@@ -9,6 +9,8 @@ POST http://localhost:3000/api/solicitudes
 Content-Type: application/json
 
 {
+  "idPasajero": 5,
+  "idViaje": 3,
   "estado": "Aceptada",
   "fechaSolicitud": "2026-02-10"
 
@@ -22,7 +24,7 @@ Content-Type: application/json
 ### PATCH --> puede ser idempotente pero no es un requisito
 ### Se usa para modificaciones parciales, solo algunos atributos
 
-PUT http://localhost:3000/api/solicitudes/3b241101-e2bb-4255-8caf-4136c566a962
+PUT http://localhost:3000/api/solicitudes/5/3
 Content-Type: application/json
 
 {
@@ -32,12 +34,12 @@ Content-Type: application/json
 
 
 ### Modificar algunos datos de una solicitud
-PATCH http://localhost:3000/api/solicitudes/3b241101-e2bb-4255-8caf-4136c566a962
+PATCH http://localhost:3000/api/solicitudes/5/3
 Content-Type: application/json
 
 {
   "estado": "Cancelada"
 }
 
-### Borrar un solicitud
-DELETE http://localhost:3000/api/solicitudes/3b241101-e2bb-4255-8caf-4136c566a962
+### Borrar una solicitud
+DELETE http://localhost:3000/api/solicitudes/5/3
