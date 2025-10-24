@@ -25,7 +25,7 @@ function sanitizedInput(req: Request, res: Response, next: NextFunction) {
 
 // Función para obtener una lista de solicitudes
 async function findAll(req: Request, res: Response) {
- try{
+  try{
      const solicitudes = await em.find(Solicitud, {}, {populate: ['pasajero', 'viaje', 'viaje.ciudad']})
      res.status(200).json({message: 'found all solicitudes', data: solicitudes})
    }
@@ -36,16 +36,47 @@ async function findAll(req: Request, res: Response) {
 
 // Función para obtener una solicitud por id
 async function findOne(req: Request, res: Response) {
-  return res.status(500).send({ message: 'Not Implemented'});
+    const { idPasajero: idPasajeroParam, idViaje: idViajeParam } = req.params;
+
+    // Validación para sólo dígitos
+    if (!/^\d+$/.test(idPasajeroParam) || !/^\d+$/.test(idViajeParam)) {
+      return res.status(400).json({ message: 'IDs inválidos' });
+    }
+
+    const idPasajero = Number(idPasajeroParam);
+    const idViaje = Number(idViajeParam);
+    
+    try{
+      const pasajero = em.getReference(Pasajero, idPasajero);
+      const viaje = em.getReference(Viaje, idViaje);
+      const solicitud = await em.findOne(Solicitud, { pasajero, viaje }, {populate: ['pasajero', 'viaje', 'viaje.ciudad']});
+      
+      if (!solicitud) {
+        return res.status(404).send({ message: 'Solicitud not found' });
+      }
+      
+      res.status(200).json({message: 'found solicitud', data: solicitud})
+    }
+    catch(error: any){
+      return res.status(500).send({ message: error.message});
+    }
 }
 
 // Función para agregar una nueva solicitud
 async function add(req: Request, res: Response) {
   try{
-      const {idPasajero, idViaje, estado, fechaSolicitud} = req.body
-      //AGREGAR PARSEO DE IDs Y VER SI SON LOS CORRECTOS
+      const {idPasajero: idPasajeroBody, idViaje: idViajeBody, estado, fechaSolicitud} = req.body.sanitizedInput;
+
+      if (!/^\d+$/.test(idPasajeroBody) || !/^\d+$/.test(idViajeBody)) {
+        return res.status(400).json({ message: 'IDs inválidos' });
+      }
+
+      const idPasajero = Number(idPasajeroBody);
+      const idViaje = Number(idViajeBody);
+
       const pasajero = em.getReference(Pasajero, idPasajero)
       const viaje = em.getReference(Viaje, idViaje)
+
       const solicitud = em.create(Solicitud,{pasajero, viaje, estado, fechaSolicitud: new Date(fechaSolicitud)});
       await em.flush(); 
       res.status(201).json({message: 'Solicitud created', data: solicitud})
@@ -58,12 +89,14 @@ async function add(req: Request, res: Response) {
 // Función para modificar los datos de una solicitud
 async function update(req: Request, res: Response) {
   try{
-     const idPasajero = Number.parseInt(req.params.idPasajero);
-     const idViaje = Number.parseInt(req.params.idViaje);
+     const { idPasajero: idPasajeroParam, idViaje: idViajeParam } = req.params;
      
-     if (isNaN(idPasajero) || isNaN(idViaje)) {
+     if (!/^\d+$/.test(idPasajeroParam) || !/^\d+$/.test(idViajeParam)) {
        return res.status(400).send({ message: 'Invalid IDs' });
      }
+
+     const idPasajero = Number(idPasajeroParam);
+     const idViaje = Number(idViajeParam);
 
      //Usa las relaciones de la entidad, no los nombres de las columnas de la base de datos
      const pasajero = em.getReference(Pasajero, idPasajero);
@@ -76,12 +109,12 @@ async function update(req: Request, res: Response) {
      }
      
      // Solo actualizar campos permitidos (estado y fechaSolicitud)
-     if (req.body.sanitizedInput.estado) {
-       solicitud.estado = req.body.sanitizedInput.estado;
-     }
-     if (req.body.sanitizedInput.fechaSolicitud) {
-       solicitud.fechaSolicitud = new Date(req.body.sanitizedInput.fechaSolicitud);
-     }
+     //if (req.body.sanitizedInput.estado) {
+       //solicitud.estado = req.body.sanitizedInput.estado;
+     //}
+     //if (req.body.sanitizedInput.fechaSolicitud) {
+       //solicitud.fechaSolicitud = new Date(req.body.sanitizedInput.fechaSolicitud);
+     //}
      
      await em.flush();
      res.status(200).json({message: 'Solicitud updated', data: solicitud})
@@ -94,12 +127,14 @@ async function update(req: Request, res: Response) {
 // Función para eliminar una solicitud
 async function remove(req: Request, res: Response) {
   try{
-    const idPasajero = Number.parseInt(req.params.idPasajero);
-    const idViaje = Number.parseInt(req.params.idViaje);
-    
-    if (isNaN(idPasajero) || isNaN(idViaje)) {
+    const { idPasajero: idPasajeroParam, idViaje: idViajeParam } = req.params;
+
+    if (!/^\d+$/.test(idPasajeroParam) || !/^\d+$/.test(idViajeParam)) {
       return res.status(400).send({ message: 'Invalid IDs' });
     }
+
+    const idPasajero = Number(idPasajeroParam);
+    const idViaje = Number(idViajeParam);
 
     const pasajero = em.getReference(Pasajero, idPasajero);
     const viaje = em.getReference(Viaje, idViaje);

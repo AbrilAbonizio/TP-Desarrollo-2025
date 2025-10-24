@@ -37,7 +37,7 @@ async function findAll(req: Request, res: Response) {
 
 // Función para obtener un pasajero por id
 async function findOne(req: Request, res: Response) {
-    const id = Number.parseInt(req.params.id);
+    const id = Number.parseInt(req.params.id); 
     if (isNaN(id)) {
     return res.status(400).json({ message: 'ID inválido' });
   }

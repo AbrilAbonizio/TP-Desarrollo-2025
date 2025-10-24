@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { Viaje } from "./viaje.entity.js";
+import {Pasajero} from "../Pasajero/pasajero.entity.js";
+import {Ciudad} from "../Ciudad/ciudad.entity.js";
 import { orm } from "../shared/orm.js";
 
 const em = orm.em;
@@ -7,15 +9,14 @@ const em = orm.em;
 // Middleware para validar que no se ingresen datos extras
 function sanitizedInput(req: Request, res: Response, next: NextFunction) {
   req.body.sanitizedInput = {
+    idOrganizador: req.body.idOrganizador,
+    idCiudad: req.body.idCiudad,
     fechaSalida: req.body.fechaSalida,
     fechaLlegada: req.body.fechaLlegada,
     estado: req.body.estado,
     cupos: req.body.cupos,
     costoEstimado: req.body.costoEstimado,
-    cupoDisponible: req.body.cupoDisponible,
-    total: req.body.total,
-    totalPorPersona: req.body.totalPorPersona,
-    descripcionVehiculo: req.body.descripcionVehiculo,
+    descVehiculo: req.body.descVehiculo
   };
   // MÁS VALIDACIONES
   Object.keys(req.body.sanitizedInput).forEach((key) => {
@@ -32,7 +33,7 @@ async function findAll(req: Request, res: Response) {
     const viajes = await em.find(
       Viaje,
       {},
-      { populate: ["solicitudes", "ciudad", "categorias"] }
+      { populate: ["ciudad", "categorias", "organizador"] }
     );
     return res
       .status(200)
@@ -45,13 +46,13 @@ async function findAll(req: Request, res: Response) {
 }
 
 // Función para obtener un viaje por id
-function findOne(req: Request, res: Response) {
+async function findOne(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
-    const viaje = em.findOneOrFail(
+    const viaje = await em.findOneOrFail(
       Viaje,
       { id: id },
-      { populate: ["solicitudes", "ciudad", "categorias"] }
+      { populate: ["organizador", "ciudad", "categorias"] }
     );
     return res.status(200).json({ message: "Viaje encontrado", data: viaje });
   } catch (error: any) {
@@ -64,7 +65,25 @@ function findOne(req: Request, res: Response) {
 // Función para agregar un nuevo viaje
 async function add(req: Request, res: Response) {
   try {
-    const viaje = em.create(Viaje, req.body.sanitizedInput);
+    const { idOrganizador: idOrganizadorBody, idCiudad: idCiudadBody, fechaSalida, fechaLlegada, estado, cupos, costoEstimado, descVehiculo } = req.body.sanitizedInput;
+
+    // Validar que sean ids numéricos
+    if (!/^\d+$/.test(idOrganizadorBody) || !/^\d+$/.test(idCiudadBody)) {
+      return res.status(400).json({ message: 'IDs de organizador o ciudad inválidos' });
+    }
+
+    const idOrganizador = Number(idOrganizadorBody);
+    const idCiudad = Number(idCiudadBody);
+
+    const organizador = em.getReference(Pasajero, idOrganizador);
+    const ciudad = em.getReference(Ciudad, idCiudad);
+
+    // Validar campos requeridos
+    if (!descVehiculo) {
+      return res.status(400).json({ message: 'descVehiculo es requerido' });
+    }
+
+    const viaje = em.create(Viaje, { organizador, ciudad, fechaSalida: new Date(fechaSalida), fechaLlegada: new Date(fechaLlegada), estado, cupos, costoEstimado, descVehiculo });
     await em.flush();
     return res.status(201).send({ message: "Viaje created", data: viaje });
   } catch (error: any) {

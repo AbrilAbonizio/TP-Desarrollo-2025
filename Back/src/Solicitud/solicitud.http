@@ -2,15 +2,15 @@
 GET http://localhost:3000/api/solicitudes
 
 ### Obtener uns solicitud por id
-GET http://localhost:3000/api/solicitudes/3b241101-e2bb-4255-8caf-4136c566a962
+GET http://localhost:3000/api/solicitudes/5/2
 
 ### Crear una nueva solicitud
-POST http://localhost:3000/api/solicitudes
+POST http://localhost:3000/api/solicitudes/
 Content-Type: application/json
 
 {
-  "idPasajero": 5,
-  "idViaje": 3,
+  "idPasajero": "5",
+  "idViaje": "3",
   "estado": "Aceptada",
   "fechaSolicitud": "2026-02-10"
 

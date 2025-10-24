@@ -6,7 +6,6 @@ GET http://localhost:3000/api/viajes
 ### Obtener un viaje por ID
 GET http://localhost:3000/api/viajes/1
 
-###
 
 ### Crear un nuevo viaje
 POST http://localhost:3000/api/viajes
@@ -21,13 +20,15 @@ Content-Type: application/json
   "cupoDisponible": 3,
   "total": 7500.00,
   "totalPorPersona": 1500.00,
-  "descripcionVehiculo": "Toyota Corolla"
+  "descVehiculo": "Toyota Corolla",
+  "idOrganizador": 1,
+  "idCiudad": 3
 }
 
 ###
 
 ### Actualizar un viaje existente (completo)
-PUT http://localhost:3000/api/viajes/1
+PUT http://localhost:3000/api/viajes/5
 Content-Type: application/json
 
 {

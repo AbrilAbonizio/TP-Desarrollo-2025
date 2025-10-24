@@ -37,7 +37,7 @@ export class Viaje {
   @Property({ nullable: false })
   descVehiculo!: string;
 
-  // CATEGORIAS MUCHJAS A MUCHAS
+  // CATEGORIAS MUCHAS A MUCHAS
   @ManyToMany(() => Categoria, (categoria) => categoria.viajes, {
     cascade: [Cascade.ALL],
     owner: true,
