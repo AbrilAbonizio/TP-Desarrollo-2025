@@ -1,8 +1,8 @@
-/*import { Request, Response, NextFunction } from 'express';
-import { ViajeRepository } from "./viaje.repository.js";
-import { Viaje } from './viaje.entity.js';
+import { Request, Response, NextFunction } from "express";
+import { Viaje } from "./viaje.entity.js";
+import { orm } from "../shared/orm.js";
 
-const repository = new ViajeRepository(); // Crea una instancia de la clase ViajeRepository
+const em = orm.em;
 
 // Middleware para validar que no se ingresen datos extras
 function sanitizedInput(req: Request, res: Response, next: NextFunction) {
@@ -27,76 +27,83 @@ function sanitizedInput(req: Request, res: Response, next: NextFunction) {
 }
 
 // Función para obtener una lista de viajes
-function findAll(req: Request, res: Response) {
-  res.json({ data: repository.findAll() });
+async function findAll(req: Request, res: Response) {
+  try {
+    const viajes = await em.find(
+      Viaje,
+      {},
+      { populate: ["solicitudes", "ciudad", "categorias"] }
+    );
+    return res
+      .status(200)
+      .json({ message: "Se encontraron los TODOS los viajes", data: viajes });
+  } catch (error: any) {
+    return res
+      .status(500)
+      .json({ message: "Error retrieving viajes", error: error.message });
+  }
 }
 
 // Función para obtener un viaje por id
 function findOne(req: Request, res: Response) {
-  const viaje = repository.findOne({ id: req.params.id });
-  if (!viaje) {
-    return res.status(404).send({ message: 'Viaje not found' });
+  try {
+    const id = Number.parseInt(req.params.id);
+    const viaje = em.findOneOrFail(
+      Viaje,
+      { id: id },
+      { populate: ["solicitudes", "ciudad", "categorias"] }
+    );
+    return res.status(200).json({ message: "Viaje encontrado", data: viaje });
+  } catch (error: any) {
+    return res
+      .status(500)
+      .json({ message: "Error retrieving viaje", error: error.message });
   }
-  return res.json(viaje);
 }
 
 // Función para agregar un nuevo viaje
-function add(req: Request, res: Response) {
-  const input = req.body.sanitizedInput;
-  const viajeInput = new Viaje(
-    0, // El ID será ignorado y generado automáticamente en el repositorio
-    new Date(input.fechaSalida),
-    new Date(input.fechaLlegada),
-    input.estado,
-    input.cupos,
-    input.costoEstimado,
-    input.cupoDisponible,
-    input.total,
-    input.totalPorPersona,
-    input.descripcionVehiculo
-  );
-  const viaje = repository.add(viajeInput);
-  return res.status(201).send({ message: 'Viaje created', data: viaje });
+async function add(req: Request, res: Response) {
+  try {
+    const viaje = em.create(Viaje, req.body.sanitizedInput);
+    await em.flush();
+    return res.status(201).send({ message: "Viaje created", data: viaje });
+  } catch (error: any) {
+    res
+      .status(500)
+      .send({ message: "Error creating viaje", error: error.message });
+  }
 }
 
 // Función para modificar los datos de un viaje
-function update(req: Request, res: Response) {
-  req.body.sanitizedInput.idViaje = parseInt(req.params.id);
-  if (req.body.sanitizedInput.fechaSalida) {
-    req.body.sanitizedInput.fechaSalida = new Date(
-      req.body.sanitizedInput.fechaSalida
-    );
-  }
-
-  if (req.body.sanitizedInput.fechaLlegada) {
-    req.body.sanitizedInput.fechaLlegada = new Date(
-      req.body.sanitizedInput.fechaLlegada
-    );
-  }
-  const viaje = repository.update(req.body.sanitizedInput);
-
-  if (viaje) {
-    return res.status(200).send({
-      message: 'Viaje modified successfully',
-
-      data: viaje,
-    });
-  } else {
-    return res.status(404).send({ message: 'Viaje not found' });
+async function update(req: Request, res: Response) {
+  try {
+    const id = Number.parseInt(req.params.id);
+    const viaje = await em.findOneOrFail(Viaje, { id: id });
+    em.assign(viaje, req.body.sanitizedInput);
+    await em.flush();
+    res.status(200).send({ message: "Viaje updated", data: viaje });
+  } catch (error: any) {
+    res
+      .status(500)
+      .send({ message: "Error updating viaje", error: error.message });
   }
 }
 
 // Función para eliminar un viaje
-function remove(req: Request, res: Response) {
-  const viaje = repository.delete({ id: req.params.id });
-  if (viaje) {
+async function remove(req: Request, res: Response) {
+  try {
+    const id = Number.parseInt(req.params.id);
+    const viaje = em.getReference(Viaje, id);
+    await em.removeAndFlush(viaje);
+    return res.status(200).send({ message: "Viaje deleted" });
+  } catch (error) {
     res
-      .status(200)
-      .send({ message: 'Viaje deleted successfully', data: viaje });
-  } else {
-    res.status(404).send({ message: 'Viaje not found' });
+      .status(500)
+      .send({
+        message: "Error deleting viaje",
+        error: (error as Error).message,
+      });
   }
 }
 
 export { sanitizedInput, findAll, findOne, add, update, remove };
-*/
