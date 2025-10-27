@@ -6,7 +6,7 @@ import {
   add,
   update,
   remove,
-} from './pasajero.controler.js';
+} from './pasajero.controller.js';
 
 export const pasajeroRouter = Router();
 

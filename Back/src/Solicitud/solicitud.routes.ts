@@ -6,7 +6,7 @@ import {
   add,
   update,
   remove,
-} from './solicitud.controler.js';
+} from './solicitud.controller.js';
 
 export const solicitudRouter = Router();
 

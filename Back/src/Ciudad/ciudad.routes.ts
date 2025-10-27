@@ -6,7 +6,7 @@ import {
   add,
   update,
   remove,
-} from './ciudad.controler.js';
+} from './ciudad.controller.js';
 
 export const ciudadRouter = Router();
 

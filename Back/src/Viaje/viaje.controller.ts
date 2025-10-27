@@ -20,7 +20,6 @@ function sanitizedInput(req: Request, res: Response, next: NextFunction) {
     costoEstimado: req.body.costoEstimado,
     descVehiculo: req.body.descVehiculo,
     categorias: req.body.categorias
-  
   };
   // Validacion para que el viaje tenga al menos una categoria
   //if (!Array.isArray(req.body.sanitizedInput.categorias) || req.body.sanitizedInput.categorias.length === 0) {
@@ -90,6 +89,7 @@ async function add(req: Request, res: Response) {
     if (error.code === 'ER_NO_REFERENCED_ROW_2') {
       return res.status(404).json({ message: 'Pasajero, Ciudad or Categoria not found'});
     }
+
     return res.status(500).json({ message: error.message });
   }
 }
@@ -132,4 +132,23 @@ async function remove(req: Request, res: Response) {
   }
 }
 
-export { sanitizedInput, findAll, findOne, add, update, remove};
+async function buscarXCategoria(req: Request, res: Response){
+  try{
+    const idCategoria = Number.parseInt(req.params.idCategoria);
+    const viajes = await em.find(Viaje, {categorias: { id: idCategoria }, estado: "disponible"}, {populate:['ciudad', 'solicitudes', 'categorias', 'organizador']});
+
+    const viajesConCupos = viajes.map(viaje => {
+      const cantAceptadas = viaje.solicitudes.getItems().filter(s => s.estado === 'Aceptada').length;
+      const cupoDisponible = viaje.cupos - cantAceptadas; 
+      return {...viaje, cupoDisponible}});
+    
+    return res.status(200).json({message: "Listado de viajes", data: viajesConCupos});
+    
+    }
+    catch(error: any){
+    return res.status(500).json({message: error.message});
+  }
+}
+
+
+export { sanitizedInput, findAll, findOne, add, update, remove, buscarXCategoria };

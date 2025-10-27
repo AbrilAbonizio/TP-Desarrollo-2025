@@ -10,7 +10,7 @@ Content-Type: application/json
 
 {
   "idPasajero": 5,
-  "idViaje": 14,
+  "idViaje": 1,
   "estado": "Aceptada",
   "fechaSolicitud": "2026-02-10"
 

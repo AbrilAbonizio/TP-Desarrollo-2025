@@ -66,6 +66,8 @@ async function add(req: Request, res: Response) {
       return res.status(409).json({ message: 'Solicitud ya existe para este pasajero y viaje' });
     }
 
+    // Validar si hay cupo para hacer la inscripcion
+
     const solicitud = em.create(Solicitud, { pasajero, viaje, fechaSolicitud, estado });
     await em.flush();
 

@@ -6,7 +6,7 @@ import {
   update,
   remove,
   sanitizedInput,
-} from "./categoria.controler.js";
+} from "./categoria.controller.js";
 
 export const categoriaRouter = Router();
 

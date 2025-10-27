@@ -19,22 +19,22 @@ export class Viaje {
   @PrimaryKey({ nullable: false })
   id!: number;
 
-  @Property({ nullable: false })
+  @Property()//{ nullable: false })
   fechaSalida!: Date;
 
-  @Property({ nullable: false })
+  @Property()//{ nullable: false })
   fechaLlegada!: Date;
 
-  @Property({ nullable: false })
+  @Property()//{ nullable: false })
   estado!: string;
 
-  @Property({ nullable: false })
+  @Property()//{ nullable: false })
   cupos!: number;
 
-  @Property({ nullable: false })
+  @Property()//{ nullable: false })
   costoEstimado!: number;
 
-  @Property({ nullable: false })
+  @Property()//{ nullable: false })
   descVehiculo!: string;
 
   // CATEGORIAS MUCHAS A MUCHAS
