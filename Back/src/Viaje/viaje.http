@@ -4,7 +4,7 @@ GET http://localhost:3000/api/viajes
 ###
 
 ### Obtener un viaje por ID
-GET http://localhost:3000/api/viajes/1
+GET http://localhost:3000/api/viajes/8
 
 
 ### Crear un nuevo viaje
@@ -57,7 +57,7 @@ Content-Type: application/json
 ###
 
 ### Eliminar un viaje
-DELETE http://localhost:3000/api/viajes/1
+DELETE http://localhost:3000/api/viajes/8
 
 ###
 

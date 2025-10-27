@@ -30,18 +30,10 @@ function sanitizedInput(req: Request, res: Response, next: NextFunction) {
 // Función para obtener una lista de viajes
 async function findAll(req: Request, res: Response) {
   try {
-    const viajes = await em.find(
-      Viaje,
-      {},
-      { populate: ["ciudad", "categorias", "organizador"] }
-    );
-    return res
-      .status(200)
-      .json({ message: "Se encontraron los TODOS los viajes", data: viajes });
+    const viajes = await em.find(Viaje, {}, { populate: ["ciudad", "categorias", "organizador"] });
+    return res.status(200).json({ message: "Se encontraron TODOS los viajes", data: viajes });
   } catch (error: any) {
-    return res
-      .status(500)
-      .json({ message: "Error retrieving viajes", error: error.message });
+    return res.status(500).json({ message: error.message });
   }
 }
 
@@ -49,31 +41,22 @@ async function findAll(req: Request, res: Response) {
 async function findOne(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
-    const viaje = await em.findOneOrFail(
-      Viaje,
-      { id: id },
-      { populate: ["organizador", "ciudad", "categorias"] }
+    const viaje = await em.findOneOrFail(Viaje, { id: id }, { populate: ["organizador", "ciudad", "categorias"] }
     );
     return res.status(200).json({ message: "Viaje encontrado", data: viaje });
   } catch (error: any) {
-    return res
-      .status(500)
-      .json({ message: "Error retrieving viaje", error: error.message });
+    return res.status(500).json({ message: error.message });
   }
 }
 
 // Función para agregar un nuevo viaje
 async function add(req: Request, res: Response) {
   try {
-    const { idOrganizador: idOrganizadorBody, idCiudad: idCiudadBody, fechaSalida, fechaLlegada, estado, cupos, costoEstimado, descVehiculo } = req.body.sanitizedInput;
+    const { idOrganizador: idOrganizadorBody, idCiudad: idCiudadBody, fechaSalida, 
+    fechaLlegada, estado, cupos, costoEstimado, descVehiculo } = req.body.sanitizedInput;
 
-    // Validar que sean ids numéricos
-    if (!/^\d+$/.test(idOrganizadorBody) || !/^\d+$/.test(idCiudadBody)) {
-      return res.status(400).json({ message: 'IDs de organizador o ciudad inválidos' });
-    }
-
-    const idOrganizador = Number(idOrganizadorBody);
-    const idCiudad = Number(idCiudadBody);
+    const idOrganizador = Number.parseInt(idOrganizadorBody);
+    const idCiudad = Number.parseInt(idCiudadBody);
 
     const organizador = em.getReference(Pasajero, idOrganizador);
     const ciudad = em.getReference(Ciudad, idCiudad);
@@ -85,11 +68,9 @@ async function add(req: Request, res: Response) {
 
     const viaje = em.create(Viaje, { organizador, ciudad, fechaSalida: new Date(fechaSalida), fechaLlegada: new Date(fechaLlegada), estado, cupos, costoEstimado, descVehiculo });
     await em.flush();
-    return res.status(201).send({ message: "Viaje created", data: viaje });
+    return res.status(201).json({ message: "Viaje created", data: viaje });
   } catch (error: any) {
-    res
-      .status(500)
-      .send({ message: "Error creating viaje", error: error.message });
+    res.status(500).json({ message: error.message });
   }
 }
 
@@ -97,14 +78,12 @@ async function add(req: Request, res: Response) {
 async function update(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
-    const viaje = await em.findOneOrFail(Viaje, { id: id });
+    const viaje = await em.findOneOrFail(Viaje, { id });
     em.assign(viaje, req.body.sanitizedInput);
     await em.flush();
     res.status(200).send({ message: "Viaje updated", data: viaje });
   } catch (error: any) {
-    res
-      .status(500)
-      .send({ message: "Error updating viaje", error: error.message });
+    res.status(500).json({ message: error.message });
   }
 }
 
@@ -115,13 +94,8 @@ async function remove(req: Request, res: Response) {
     const viaje = em.getReference(Viaje, id);
     await em.removeAndFlush(viaje);
     return res.status(200).send({ message: "Viaje deleted" });
-  } catch (error) {
-    res
-      .status(500)
-      .send({
-        message: "Error deleting viaje",
-        error: (error as Error).message,
-      });
+  } catch (error: any) {
+    res.status(500).json({message: error.message});
   }
 }
 

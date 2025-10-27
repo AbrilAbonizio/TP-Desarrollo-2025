@@ -71,15 +71,18 @@ async function add(req: Request, res: Response) {
         return res.status(400).json({ message: 'IDs inválidos' });
       }
 
-      const idPasajero = Number(idPasajeroBody);
-      const idViaje = Number(idViajeBody);
+      const idPasajero = Number.parseInt(idPasajeroBody);
+      const idViaje = Number.parseInt(idViajeBody);
 
-      const pasajero = em.getReference(Pasajero, idPasajero)
-      const viaje = em.getReference(Viaje, idViaje)
+      // verifica si existe el pasajero    
+      const pasajero = await em.findOne(Pasajero, { id: idPasajero });
+      if (!pasajero) return res.status(404).json({ message: 'Pasajero not found' });
 
-      const solicitud = em.create(Solicitud,{pasajero, viaje, estado, fechaSolicitud: new Date(fechaSolicitud)});
-      await em.flush(); 
-      res.status(201).json({message: 'Solicitud created', data: solicitud})
+      const viaje = em.getReference(Viaje, idViaje);
+
+      const solicitud = em.create(Solicitud, { pasajero, viaje, estado, fechaSolicitud: new Date(fechaSolicitud) });
+      await em.flush();
+      return res.status(201).json({ message: 'Solicitud created', data: solicitud });
     }
     catch(error: any){
       return res.status(500).send({ message: error.message});
@@ -107,14 +110,6 @@ async function update(req: Request, res: Response) {
      if (!solicitud) {
        return res.status(404).send({ message: 'Solicitud not found' });
      }
-     
-     // Solo actualizar campos permitidos (estado y fechaSolicitud)
-     //if (req.body.sanitizedInput.estado) {
-       //solicitud.estado = req.body.sanitizedInput.estado;
-     //}
-     //if (req.body.sanitizedInput.fechaSolicitud) {
-       //solicitud.fechaSolicitud = new Date(req.body.sanitizedInput.fechaSolicitud);
-     //}
      
      await em.flush();
      res.status(200).json({message: 'Solicitud updated', data: solicitud})

@@ -9,8 +9,8 @@ POST http://localhost:3000/api/solicitudes/
 Content-Type: application/json
 
 {
-  "idPasajero": "5",
-  "idViaje": "3",
+  "idPasajero": "1",
+  "idViaje": "7",
   "estado": "Aceptada",
   "fechaSolicitud": "2026-02-10"
 
@@ -42,4 +42,4 @@ Content-Type: application/json
 }
 
 ### Borrar una solicitud
-DELETE http://localhost:3000/api/solicitudes/5/3
+DELETE http://localhost:3000/api/solicitudes/1/7

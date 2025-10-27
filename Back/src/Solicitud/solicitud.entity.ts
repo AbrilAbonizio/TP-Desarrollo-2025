@@ -8,7 +8,8 @@ export class Solicitud {
   @ManyToOne(() => Pasajero, { primary: true, fieldName: 'idPasajero' })
   pasajero!: Rel<Pasajero>;
 
-  @ManyToOne(() => Viaje, { primary: true, fieldName: 'idViaje' })
+ 
+  @ManyToOne(() => Viaje, { primary: true, fieldName: 'idViaje'})
   viaje!: Rel<Viaje>;
 
   @Property()

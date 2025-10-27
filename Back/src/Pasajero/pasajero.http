@@ -51,4 +51,4 @@ Content-Type: application/json
 ###}
 
 ### Borrar un pasajero
-DELETE http://localhost:3000/api/pasajeros/6
+DELETE http://localhost:3000/api/pasajeros/7

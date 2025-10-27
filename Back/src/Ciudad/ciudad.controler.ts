@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-//import { CiudadRepository } from './ciudad.repository.js';
 import { Ciudad } from './ciudad.entity.js';
+import { orm } from '../shared/orm.js';
+import { NotFoundError } from '@mikro-orm/core';
 
-//const repository = new CiudadRepository(); // Crea una instancia de la clase CiudadRepository
+const em = orm.em;
 
 // Middleware para validar que no se ingresen datos extras
 function sanitizedInput(req: Request, res: Response, next: NextFunction) {
@@ -23,27 +24,76 @@ function sanitizedInput(req: Request, res: Response, next: NextFunction) {
 
 // Función para obtener una lista de ciudades
 async function findAll(req: Request, res: Response) {
-  return res.status(500).send({ message: 'Not Implemented'});
-}
+  try{
+    const ciudades = await em.find(Ciudad, {});
+    return res.status(200).json({message: 'found all ciudades', data: ciudades})
+  }
+  catch(error: any){
+    return res.status(500).json({message: error.message})
+    }
+  }
+
 
 // Función para obtener una ciudad por id
 async function findOne(req: Request, res: Response) {
-  return res.status(500).send({ message: 'Not Implemented'});
+  try{
+    const id = Number.parseInt(req.params.id);
+    const ciudad = await em.findOneOrFail(Ciudad, {id});
+    return res.status(200).json({message: 'Found Ciudad', data: ciudad})
+  }
+  catch(error: any){
+    if (error instanceof NotFoundError){
+      return res.status(404).json({message: "Ciudad not found"});
+    }
+    return res.status(500).json({message: error.message});
+  }
 }
 
 // Función para agregar una nueva ciudad
 async function add(req: Request, res: Response) {
-  return res.status(500).send({ message: 'Not Implemented'});
+  try{
+    const ciudad = em.create(Ciudad, req.body.sanitizedInput);
+    await em.flush();
+    return res.status(201).json({message: 'Ciudad created', data: ciudad})
+  }
+  catch(error: any){
+    return res.status(500).json({ message: error.message});
+  }
+  
 }
 
 // Función para modificar los datos de una ciudad
 async function update(req: Request, res: Response) {
- return res.status(500).send({ message: 'Not Implemented'});
+  try{
+    const id = Number.parseInt(req.params.id);
+    const ciudad = em.getReference(Ciudad, id); // busca id en la base de datos
+    em.assign(ciudad, req.body.sanitizedInput); // asigna al objeto los nuevos datos
+    await em.flush();
+    return res.status(200).json({message: "Ciudad modified", data: ciudad});
+  }
+  catch(error:any){
+    if (error instanceof NotFoundError){
+      return res.status(404).json({message: "Ciudad not found"});
+    }
+    return res.status(500).send({ message: error.message});
+  }
 }
 
 // Función para eliminar una ciudad
 async function remove(req: Request, res: Response) {
-  return res.status(500).send({ message: 'Not Implemented'});
+  try{
+    const id = Number.parseInt(req.params.id);
+    const ciudad = em.getReference(Ciudad, id); // busca id en la base de datos
+    const rows = await em.removeAndFlush(ciudad);
+    if(rows === 0){
+      return res.status(404).json({message: "Ciudad not found"});
+    }
+    return res.status(200).json({message: "Ciudad modified", data: ciudad});
+  }
+  catch (error: any){
+    return res.status(500).send({ message: error.message});
+  }
+
 }
 
 export { sanitizedInput, findAll, findOne, add, update, remove };
