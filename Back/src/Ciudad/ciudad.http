@@ -23,7 +23,7 @@ Content-Type: application/json
 ### PATCH --> puede ser idempotente pero no es un requisito
 ### Se usa para modificaciones parciales, solo algunos atributos
 
-PUT http://localhost:3000/api/ciudades/4
+PUT http://localhost:3000/api/ciudades/5
 Content-Type: application/json
 
 {
@@ -44,4 +44,4 @@ Content-Type: application/json
 }
 
 ### Borrar una ciudad
-DELETE http://localhost:3000/api/ciudades/7
+DELETE http://localhost:3000/api/ciudades/3

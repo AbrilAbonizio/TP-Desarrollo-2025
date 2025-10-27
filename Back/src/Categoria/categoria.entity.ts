@@ -18,6 +18,7 @@ export class Categoria {
 
   @ManyToMany(() => Viaje, (viaje) => viaje.categorias, {
     cascade: [Cascade.ALL],
+    owner: true
   })
   viajes = new Collection<Viaje>(this);
 }

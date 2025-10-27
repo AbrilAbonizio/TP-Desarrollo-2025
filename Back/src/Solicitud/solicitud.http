@@ -2,15 +2,15 @@
 GET http://localhost:3000/api/solicitudes
 
 ### Obtener uns solicitud por id
-GET http://localhost:3000/api/solicitudes/5/2
+GET http://localhost:3000/api/solicitudes/5/14
 
 ### Crear una nueva solicitud
 POST http://localhost:3000/api/solicitudes/
 Content-Type: application/json
 
 {
-  "idPasajero": "1",
-  "idViaje": "7",
+  "idPasajero": 5,
+  "idViaje": 14,
   "estado": "Aceptada",
   "fechaSolicitud": "2026-02-10"
 
@@ -24,7 +24,7 @@ Content-Type: application/json
 ### PATCH --> puede ser idempotente pero no es un requisito
 ### Se usa para modificaciones parciales, solo algunos atributos
 
-PUT http://localhost:3000/api/solicitudes/5/3
+PUT http://localhost:3000/api/solicitudes/9/7
 Content-Type: application/json
 
 {
@@ -34,7 +34,7 @@ Content-Type: application/json
 
 
 ### Modificar algunos datos de una solicitud
-PATCH http://localhost:3000/api/solicitudes/5/3
+PATCH http://localhost:3000/api/solicitudes/5/5
 Content-Type: application/json
 
 {
@@ -42,4 +42,4 @@ Content-Type: application/json
 }
 
 ### Borrar una solicitud
-DELETE http://localhost:3000/api/solicitudes/1/7
+DELETE http://localhost:3000/api/solicitudes/9/7

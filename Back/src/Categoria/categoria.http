@@ -2,7 +2,7 @@
 GET http://localhost:3000/api/categorias
 
 ### Obtener una categoría por id
-GET http://localhost:3000/api/categorias/49417e44-dde4-4e17-92cc-657274948182
+GET http://localhost:3000/api/categorias/4
 
 ### Crear una nueva categoría
 POST http://localhost:3000/api/categorias
@@ -19,7 +19,7 @@ Content-Type: application/json
 ### PATCH --> puede ser idempotente pero no es un requisito
 ### Se usa para modificaciones parciales, solo algunos atributos
 
-PUT http://localhost:3000/api/categorias/49417e44-dde4-4e17-92cc-657274948182
+PUT http://localhost:3000/api/categorias/7
 Content-Type: application/json
 
 {
@@ -36,4 +36,4 @@ Content-Type: application/json
 }
 
 ### Borrar una categoría
-DELETE http://localhost:3000/api/categorias/49417e44-dde4-4e17-92cc-657274948182
+DELETE http://localhost:3000/api/categorias/2

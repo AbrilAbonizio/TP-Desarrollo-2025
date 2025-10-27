@@ -38,10 +38,7 @@ export class Viaje {
   descVehiculo!: string;
 
   // CATEGORIAS MUCHAS A MUCHAS
-  @ManyToMany(() => Categoria, (categoria) => categoria.viajes, {
-    cascade: [Cascade.ALL],
-    owner: true,
-  })
+  @ManyToMany(() => Categoria, (categoria) => categoria.viajes)
   categorias = new Collection<Categoria>(this);
 
   // MUCHOS VIAJES A UNA CIUDAD, UNA CIUDAD TIENE MUCHOS VIAJES

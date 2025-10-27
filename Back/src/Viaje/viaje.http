@@ -4,7 +4,7 @@ GET http://localhost:3000/api/viajes
 ###
 
 ### Obtener un viaje por ID
-GET http://localhost:3000/api/viajes/8
+GET http://localhost:3000/api/viajes/14
 
 
 ### Crear un nuevo viaje
@@ -22,13 +22,14 @@ Content-Type: application/json
   "totalPorPersona": 1500.00,
   "descVehiculo": "Toyota Corolla",
   "idOrganizador": 1,
-  "idCiudad": 3
+  "idCiudad": 2,
+  "categorias": [2]
 }
 
 ###
 
 ### Actualizar un viaje existente (completo)
-PUT http://localhost:3000/api/viajes/5
+PUT http://localhost:3000/api/viajes/14
 Content-Type: application/json
 
 {
@@ -40,7 +41,8 @@ Content-Type: application/json
   "cupoDisponible": 4,
   "total": 10800.00,
   "totalPorPersona": 1800.00,
-  "descripcionVehiculo": "Honda Civic"
+  "descripcionVehiculo": "Honda Civic",
+  "categorias": [2] 
 }
 
 ###
@@ -57,7 +59,7 @@ Content-Type: application/json
 ###
 
 ### Eliminar un viaje
-DELETE http://localhost:3000/api/viajes/8
+DELETE http://localhost:3000/api/viajes/21
 
 ###
 

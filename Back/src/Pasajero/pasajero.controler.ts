@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Pasajero } from './pasajero.entity.js';
 import {orm} from '../shared/orm.js';
-import { AnyCnameRecord } from 'node:dns';
+import { NotFoundError } from '@mikro-orm/core';
 
 const em = orm.em;
 
@@ -37,15 +37,15 @@ async function findAll(req: Request, res: Response) {
 
 // Función para obtener un pasajero por id
 async function findOne(req: Request, res: Response) {
+  try{    
     const id = Number.parseInt(req.params.id); 
-    if (isNaN(id)) {
-    return res.status(400).json({ message: 'ID inválido' });
-  }
-  try{
     const pasajero = await em.findOneOrFail(Pasajero, {id})
-    res.status(200).json({message: 'found pasajero', data: pasajero})
+    res.status(200).json({message: 'Found pasajero', data: pasajero})
   }
   catch(error: any){
+    if (error instanceof NotFoundError){
+      return res.status(404).json({message: "Pasajero not found"});
+    }
     return res.status(500).send({ message: error.message});
   }
 }
@@ -54,7 +54,7 @@ async function findOne(req: Request, res: Response) {
 async function add(req: Request, res: Response) {
   try{
     // Es una operacion sincronica que no necesita acceder a la base de datos
-    const pasajero = em.create(Pasajero, req.body); // FALTA SANITIZAR EL BODY 
+    const pasajero = em.create(Pasajero, req.body.sanitizedInput); 
     await em.flush(); //commit hacia la base de datos, SI ES ASINCRONICA
     res.status(201).json({message: 'Pasajero created', data: pasajero})
   }
@@ -67,13 +67,15 @@ async function add(req: Request, res: Response) {
 async function update(req: Request, res: Response) {
   try{
     const id = Number.parseInt(req.params.id);
-    const pasajero = em.getReference(Pasajero, id); //No siempre es conveniente
-    em.assign(pasajero, req.body); // FALTA SANITIZAR EL BODY
+    const pasajero = await em.findOneOrFail(Pasajero, id);
+    em.assign(pasajero, req.body.sanitizedInput); 
     await em.flush();
     res.status(200).json({message: 'Pasajero updated', data: pasajero})
-    
   }
   catch(error: any){
+    if (error instanceof NotFoundError){
+      return res.status(404).json({message: "Pasajero not found"});
+    }
     return res.status(500).send({ message: error.message});
   }
 }
@@ -82,11 +84,30 @@ async function update(req: Request, res: Response) {
 async function remove(req: Request, res: Response) {
   try{
     const id = Number.parseInt(req.params.id);
-    const pasajero = em.getReference(Pasajero, id); 
-    await em.removeAndFlush(pasajero);
-    res.status(204).json({message: 'Pasajero deleted successfully', data: pasajero})
+
+    // Buscar el pasajero con sus solicitudes y viajes
+    const pasajero = await em.findOneOrFail(Pasajero, id, {populate: [ 'solicitudes', 'viajes', 'viajes.solicitudes']}); 
+    
+    // Primero borrar las relaciones y por ultimo borrar el pasajero
+    em.remove(pasajero.solicitudes); // Solicitudes que realizo el pasajero a otros viajes
+    
+    // Solicitudes asociadas a cada viaje organizado por el pasajero
+    for (const viaje of pasajero.viajes) {
+     em.remove(viaje.solicitudes);
+    }
+
+    // Viajes organizados por el pasajero
+    em.remove(pasajero.viajes); 
+    
+    em.remove(pasajero);
+    await em.flush();
+
+    res.status(200).json({message: 'Pasajero deleted successfully', data: pasajero})
   }
   catch(error: any){
+    if (error instanceof NotFoundError){
+      return res.status(404).json({message: "Pasajero not found"});
+    }
     return res.status(500).send({ message: error.message});
   }
 

@@ -30,8 +30,8 @@ async function findAll(req: Request, res: Response) {
   }
   catch(error: any){
     return res.status(500).json({message: error.message})
-    }
   }
+}
 
 
 // Función para obtener una ciudad por id
@@ -59,14 +59,13 @@ async function add(req: Request, res: Response) {
   catch(error: any){
     return res.status(500).json({ message: error.message});
   }
-  
 }
 
 // Función para modificar los datos de una ciudad
 async function update(req: Request, res: Response) {
   try{
     const id = Number.parseInt(req.params.id);
-    const ciudad = em.getReference(Ciudad, id); // busca id en la base de datos
+    const ciudad = await em.findOneOrFail(Ciudad, id); // busca id en la base de datos
     em.assign(ciudad, req.body.sanitizedInput); // asigna al objeto los nuevos datos
     await em.flush();
     return res.status(200).json({message: "Ciudad modified", data: ciudad});
@@ -83,14 +82,24 @@ async function update(req: Request, res: Response) {
 async function remove(req: Request, res: Response) {
   try{
     const id = Number.parseInt(req.params.id);
-    const ciudad = em.getReference(Ciudad, id); // busca id en la base de datos
-    const rows = await em.removeAndFlush(ciudad);
-    if(rows === 0){
-      return res.status(404).json({message: "Ciudad not found"});
+    const ciudad = await em.findOneOrFail(Ciudad, id, {populate: ['viajes', 'viajes.solicitudes',]});
+
+    // Borrar solicitudes asociadas a cada viaje de la ciudad
+    for (const viaje of ciudad.viajes) {
+      em.remove(viaje.solicitudes);
     }
-    return res.status(200).json({message: "Ciudad modified", data: ciudad});
+
+    // Borrar los viajes de la ciudad
+    em.remove(ciudad.viajes);
+  
+    em.remove(ciudad);
+    await em.flush();
+    return res.status(200).json({message: "Ciudad deleted", data: ciudad});
   }
   catch (error: any){
+    if (error instanceof NotFoundError){
+      return res.status(404).json({message: "Ciudad not found"});
+    }
     return res.status(500).send({ message: error.message});
   }
 

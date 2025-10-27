@@ -2,7 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import { Viaje } from "./viaje.entity.js";
 import {Pasajero} from "../Pasajero/pasajero.entity.js";
 import {Ciudad} from "../Ciudad/ciudad.entity.js";
+import {Categoria} from "../Categoria/categoria.entity.js";
 import { orm } from "../shared/orm.js";
+import { NotFoundError } from '@mikro-orm/core';
 
 const em = orm.em;
 
@@ -11,13 +13,20 @@ function sanitizedInput(req: Request, res: Response, next: NextFunction) {
   req.body.sanitizedInput = {
     idOrganizador: req.body.idOrganizador,
     idCiudad: req.body.idCiudad,
-    fechaSalida: req.body.fechaSalida,
-    fechaLlegada: req.body.fechaLlegada,
+    fechaSalida: new Date(req.body.fechaSalida),
+    fechaLlegada: new Date(req.body.fechaLlegada),
     estado: req.body.estado,
     cupos: req.body.cupos,
     costoEstimado: req.body.costoEstimado,
-    descVehiculo: req.body.descVehiculo
+    descVehiculo: req.body.descVehiculo,
+    categorias: req.body.categorias
+  
   };
+  // Validacion para que el viaje tenga al menos una categoria
+  //if (!Array.isArray(req.body.sanitizedInput.categorias) || req.body.sanitizedInput.categorias.length === 0) {
+    //return res.status(400).json({ message: 'El campo categorias debe ser un array con al menos un id' });
+  //}
+
   // MÁS VALIDACIONES
   Object.keys(req.body.sanitizedInput).forEach((key) => {
     if (req.body.sanitizedInput[key] === undefined) {
@@ -32,7 +41,8 @@ async function findAll(req: Request, res: Response) {
   try {
     const viajes = await em.find(Viaje, {}, { populate: ["ciudad", "categorias", "organizador"] });
     return res.status(200).json({ message: "Se encontraron TODOS los viajes", data: viajes });
-  } catch (error: any) {
+  } 
+  catch (error: any) {
     return res.status(500).json({ message: error.message });
   }
 }
@@ -41,10 +51,14 @@ async function findAll(req: Request, res: Response) {
 async function findOne(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
-    const viaje = await em.findOneOrFail(Viaje, { id: id }, { populate: ["organizador", "ciudad", "categorias"] }
+    const viaje = await em.findOneOrFail(Viaje,  id , { populate: ["organizador", "ciudad", "categorias"] }
     );
     return res.status(200).json({ message: "Viaje encontrado", data: viaje });
-  } catch (error: any) {
+  }
+  catch (error: any) {
+    if (error instanceof NotFoundError){
+      return res.status(404).json({message: "Viaje not found"});
+    }
     return res.status(500).json({ message: error.message });
   }
 }
@@ -52,25 +66,31 @@ async function findOne(req: Request, res: Response) {
 // Función para agregar un nuevo viaje
 async function add(req: Request, res: Response) {
   try {
-    const { idOrganizador: idOrganizadorBody, idCiudad: idCiudadBody, fechaSalida, 
-    fechaLlegada, estado, cupos, costoEstimado, descVehiculo } = req.body.sanitizedInput;
 
-    const idOrganizador = Number.parseInt(idOrganizadorBody);
-    const idCiudad = Number.parseInt(idCiudadBody);
+    const {idOrganizador, idCiudad} = req.body.sanitizedInput
 
-    const organizador = em.getReference(Pasajero, idOrganizador);
-    const ciudad = em.getReference(Ciudad, idCiudad);
+    // En el front se va a mostrar una lista de categorias, osea que va a estar limitado a solo
+    // esas categorias que se encuentran en la BD, por lo tanto no es necesario validar
+    // si existe o no la categoria
 
-    // Validar campos requeridos
-    if (!descVehiculo) {
-      return res.status(400).json({ message: 'descVehiculo es requerido' });
-    }
+    //Obtiene referencias al organizador y al viaje
+    const organizador = em.getReference(Pasajero, Number.parseInt(idOrganizador));
+    const ciudad = em.getReference(Ciudad, Number.parseInt(idCiudad));
 
-    const viaje = em.create(Viaje, { organizador, ciudad, fechaSalida: new Date(fechaSalida), fechaLlegada: new Date(fechaLlegada), estado, cupos, costoEstimado, descVehiculo });
+    // Obtiene referencias a cada categoria
+    const categorias = req.body.sanitizedInput.categorias?.map((id: number) =>em.getReference(Categoria, id)) || [];
+
+    const viaje = em.create(Viaje, {organizador, ciudad, categorias, ...req.body.sanitizedInput});
     await em.flush();
     return res.status(201).json({ message: "Viaje created", data: viaje });
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
+
+  } 
+  catch (error: any) {
+     // Si create() no encuentra el pasajero o la ciudad lanza error
+    if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+      return res.status(404).json({ message: 'Pasajero, Ciudad or Categoria not found'});
+    }
+    return res.status(500).json({ message: error.message });
   }
 }
 
@@ -78,12 +98,16 @@ async function add(req: Request, res: Response) {
 async function update(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
-    const viaje = await em.findOneOrFail(Viaje, { id });
-    em.assign(viaje, req.body.sanitizedInput);
+    const viaje = await em.findOneOrFail(Viaje, id, {populate: ["organizador", "ciudad", "categorias"]});
+    em.assign(viaje, req.body.sanitizedInput); // VER COMO HACER PARA AGREGARLE UNA CATEGORIA Y NO QUE SE BORRE TODO
     await em.flush();
-    res.status(200).send({ message: "Viaje updated", data: viaje });
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    return res.status(200).send({ message: "Viaje updated", data: viaje });
+  } 
+  catch (error: any) {
+    if (error instanceof NotFoundError){
+      return res.status(404).json({message: "Viaje not found"});
+    }
+    return res.status(500).json({ message: error.message });
   }
 }
 
@@ -91,12 +115,21 @@ async function update(req: Request, res: Response) {
 async function remove(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
-    const viaje = em.getReference(Viaje, id);
-    await em.removeAndFlush(viaje);
+    const viaje = await em.findOneOrFail(Viaje, id, {populate: ["organizador", "ciudad", "categorias", "solicitudes"]});
+    
+    // Borrar las solicitudes del viaje
+    em.remove(viaje.solicitudes);
+    
+    em.remove(viaje);
+    await em.flush();
     return res.status(200).send({ message: "Viaje deleted" });
-  } catch (error: any) {
-    res.status(500).json({message: error.message});
+  } 
+  catch (error: any) {
+    if (error instanceof NotFoundError){
+      return res.status(404).json({message: "Viaje not found"});
+    }
+    return res.status(500).json({message: error.message});
   }
 }
 
-export { sanitizedInput, findAll, findOne, add, update, remove };
+export { sanitizedInput, findAll, findOne, add, update, remove};

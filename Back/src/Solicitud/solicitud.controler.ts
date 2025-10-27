@@ -3,6 +3,8 @@ import { Solicitud } from './solicitud.entity.js';
 import { Pasajero } from '../Pasajero/pasajero.entity.js';
 import { Viaje } from '../Viaje/viaje.entity.js';
 import {orm} from '../shared/orm.js';
+import { NotFoundError } from '@mikro-orm/core';
+
 
 const em = orm.em;
 
@@ -10,9 +12,9 @@ const em = orm.em;
 function sanitizedInput(req: Request, res: Response, next: NextFunction) {
   req.body.sanitizedInput = {
     estado: req.body.estado,
-    fechaSolicitud: req.body.fechaSolicitud,
-    idPasajero: req.body.idPasajero,
-    idViaje: req.body.idViaje
+    fechaSolicitud: new Date(req.body.fechaSolicitud),
+    idPasajero: req.params.idPasajero || req.body.idPasajero,
+    idViaje: req.params.idViaje || req.body.idViaje
   };
   // MÁS VALIDACIONES
   Object.keys(req.body.sanitizedInput).forEach((key) => {
@@ -26,95 +28,77 @@ function sanitizedInput(req: Request, res: Response, next: NextFunction) {
 // Función para obtener una lista de solicitudes
 async function findAll(req: Request, res: Response) {
   try{
-     const solicitudes = await em.find(Solicitud, {}, {populate: ['pasajero', 'viaje', 'viaje.ciudad']})
-     res.status(200).json({message: 'found all solicitudes', data: solicitudes})
-   }
-   catch(error: any){
-     return res.status(500).send({ message: error.message });
-   }
+    const solicitudes = await em.find(Solicitud, {}, {populate: ['pasajero', 'viaje', 'viaje.ciudad', 'viaje.categorias', 'viaje.organizador']})
+    res.status(200).json({message: 'found all solicitudes', data: solicitudes})
+  }
+  catch(error: any){
+    return res.status(500).send({ message: error.message });
+  }
 }
 
 // Función para obtener una solicitud por id
 async function findOne(req: Request, res: Response) {
-    const { idPasajero: idPasajeroParam, idViaje: idViajeParam } = req.params;
-
-    // Validación para sólo dígitos
-    if (!/^\d+$/.test(idPasajeroParam) || !/^\d+$/.test(idViajeParam)) {
-      return res.status(400).json({ message: 'IDs inválidos' });
+  try{
+    const pasajero = Number.parseInt(req.params.idPasajero);
+    const viaje = Number.parseInt(req.params.idViaje);
+    const solicitud = await em.findOneOrFail(Solicitud, { pasajero, viaje }, {populate: ['pasajero', 'viaje', 'viaje.ciudad', 'viaje.categorias', 'viaje.organizador']});
+    res.status(200).json({message: 'Found Solicitud', data: solicitud})
+  }
+  catch(error: any){
+    if (error instanceof NotFoundError){
+      return res.status(404).json({message: "Solicitud not found"});
     }
-
-    const idPasajero = Number(idPasajeroParam);
-    const idViaje = Number(idViajeParam);
-    
-    try{
-      const pasajero = em.getReference(Pasajero, idPasajero);
-      const viaje = em.getReference(Viaje, idViaje);
-      const solicitud = await em.findOne(Solicitud, { pasajero, viaje }, {populate: ['pasajero', 'viaje', 'viaje.ciudad']});
-      
-      if (!solicitud) {
-        return res.status(404).send({ message: 'Solicitud not found' });
-      }
-      
-      res.status(200).json({message: 'found solicitud', data: solicitud})
-    }
-    catch(error: any){
-      return res.status(500).send({ message: error.message});
-    }
+    return res.status(500).send({ message: error.message});
+  }
 }
 
 // Función para agregar una nueva solicitud
 async function add(req: Request, res: Response) {
   try{
-      const {idPasajero: idPasajeroBody, idViaje: idViajeBody, estado, fechaSolicitud} = req.body.sanitizedInput;
+    const { fechaSolicitud, estado, idPasajero, idViaje } = req.body.sanitizedInput;
 
-      if (!/^\d+$/.test(idPasajeroBody) || !/^\d+$/.test(idViajeBody)) {
-        return res.status(400).json({ message: 'IDs inválidos' });
-      }
+    const pasajero = em.getReference(Pasajero, Number.parseInt(idPasajero));
+    const viaje = em.getReference(Viaje, Number.parseInt(idViaje));
 
-      const idPasajero = Number.parseInt(idPasajeroBody);
-      const idViaje = Number.parseInt(idViajeBody);
-
-      // verifica si existe el pasajero    
-      const pasajero = await em.findOne(Pasajero, { id: idPasajero });
-      if (!pasajero) return res.status(404).json({ message: 'Pasajero not found' });
-
-      const viaje = em.getReference(Viaje, idViaje);
-
-      const solicitud = em.create(Solicitud, { pasajero, viaje, estado, fechaSolicitud: new Date(fechaSolicitud) });
-      await em.flush();
-      return res.status(201).json({ message: 'Solicitud created', data: solicitud });
+    // Validacion que no haya una solicitud creada para el mismo viaje y mismo pasajero
+    const solicitudExistente = await em.findOne(Solicitud, { pasajero, viaje });
+    if (solicitudExistente) {
+      return res.status(409).json({ message: 'Solicitud ya existe para este pasajero y viaje' });
     }
-    catch(error: any){
-      return res.status(500).send({ message: error.message});
+
+    const solicitud = em.create(Solicitud, { pasajero, viaje, fechaSolicitud, estado });
+    await em.flush();
+
+    return res.status(201).json({ message: 'Solicitud created', data: solicitud });
+  } 
+  catch(error: any){
+    // Si create() no encuentra el pasajero o el viaje lanza error
+    if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+      return res.status(404).json({ message: 'Pasajero o Viaje not found'});
     }
+
+    return res.status(500).send({ message: error.message});
+  }
 }
 
 // Función para modificar los datos de una solicitud
 async function update(req: Request, res: Response) {
   try{
-     const { idPasajero: idPasajeroParam, idViaje: idViajeParam } = req.params;
-     
-     if (!/^\d+$/.test(idPasajeroParam) || !/^\d+$/.test(idViajeParam)) {
-       return res.status(400).send({ message: 'Invalid IDs' });
-     }
+    const pasajero = Number.parseInt(req.params.idPasajero);
+    const viaje = Number.parseInt(req.params.idViaje);
 
-     const idPasajero = Number(idPasajeroParam);
-     const idViaje = Number(idViajeParam);
-
-     //Usa las relaciones de la entidad, no los nombres de las columnas de la base de datos
-     const pasajero = em.getReference(Pasajero, idPasajero);
-     const viaje = em.getReference(Viaje, idViaje);
+    const solicitud = await em.findOneOrFail(Solicitud, { pasajero, viaje }, {populate: ['pasajero', 'viaje', 'viaje.ciudad', 'viaje.categorias', 'viaje.organizador']});
+    em.assign(solicitud, req.body.sanitizedInput);
      
-     const solicitud = await em.findOne(Solicitud, { pasajero, viaje });
-     
-     if (!solicitud) {
-       return res.status(404).send({ message: 'Solicitud not found' });
-     }
-     
-     await em.flush();
-     res.status(200).json({message: 'Solicitud updated', data: solicitud})
+    await em.flush();
+    res.status(200).json({message: 'Solicitud updated', data: solicitud})
    }
    catch(error: any){
+    if (error instanceof NotFoundError){
+      // Para saber cual id es el que falla tengo que buscar el pasajero Y el viaje
+      // en la BD para despues verificarlo
+      return res.status(404).json({message: "Solicitud not found"});
+    }
      return res.status(500).send({ message: error.message});
    }
 }
@@ -122,29 +106,17 @@ async function update(req: Request, res: Response) {
 // Función para eliminar una solicitud
 async function remove(req: Request, res: Response) {
   try{
-    const { idPasajero: idPasajeroParam, idViaje: idViajeParam } = req.params;
-
-    if (!/^\d+$/.test(idPasajeroParam) || !/^\d+$/.test(idViajeParam)) {
-      return res.status(400).send({ message: 'Invalid IDs' });
-    }
-
-    const idPasajero = Number(idPasajeroParam);
-    const idViaje = Number(idViajeParam);
-
-    const pasajero = em.getReference(Pasajero, idPasajero);
-    const viaje = em.getReference(Viaje, idViaje);
+    const pasajero = Number.parseInt(req.params.idPasajero);
+    const viaje = Number.parseInt(req.params.idViaje);
     
-    // Para claves compuestas, hay que buscar primero
-    const solicitud = await em.findOne(Solicitud, { pasajero, viaje });
-    
-    if (!solicitud) {
-      return res.status(404).send({ message: 'Solicitud not found' });
-    }
-    
+    const solicitud = await em.findOneOrFail(Solicitud, { pasajero, viaje} );
     await em.removeAndFlush(solicitud);
     res.status(200).json({message: 'Solicitud deleted successfully', data: solicitud});
   }
   catch(error: any){
+    if (error instanceof NotFoundError){
+      return res.status(404).json({message: "Solicitud not found"});
+    }
     return res.status(500).send({ message: error.message});
   }
 }
