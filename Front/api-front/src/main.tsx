@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 
 //import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootswatch/dist/lux/bootstrap.min.css';
+import 'bootswatch/dist/morph/bootstrap.min.css';
 import './App.css';
 import App from './App.tsx';
 

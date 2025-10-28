@@ -1,5 +1,6 @@
 interface PrimaryButtonProps {
   texto: string;
+  //handleClick:
 }
 
 function PrimaryButton({ texto }: PrimaryButtonProps) {
