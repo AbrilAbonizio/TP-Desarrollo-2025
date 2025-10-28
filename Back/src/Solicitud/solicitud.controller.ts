@@ -58,7 +58,7 @@ async function add(req: Request, res: Response) {
     const { fechaSolicitud, estado, idPasajero, idViaje } = req.body.sanitizedInput;
 
     const pasajero = em.getReference(Pasajero, Number.parseInt(idPasajero));
-    const viaje = em.getReference(Viaje, Number.parseInt(idViaje));
+    const viaje = await em.findOneOrFail(Viaje, Number.parseInt(idViaje), {populate: ['solicitudes']});
 
     // Validacion que no haya una solicitud creada para el mismo viaje y mismo pasajero
     const solicitudExistente = await em.findOne(Solicitud, { pasajero, viaje });
@@ -67,6 +67,11 @@ async function add(req: Request, res: Response) {
     }
 
     // Validar si hay cupo para hacer la inscripcion
+    const solicitudes = viaje.solicitudes.filter((solicitud) => solicitud.estado === 'Aceptada');
+    const cupoDisponible = viaje.cupos - solicitudes.length;
+    if (cupoDisponible === 0){
+      return res.status(409).json({message: "Cupo de viaje completo"});
+    }
 
     const solicitud = em.create(Solicitud, { pasajero, viaje, fechaSolicitud, estado });
     await em.flush();

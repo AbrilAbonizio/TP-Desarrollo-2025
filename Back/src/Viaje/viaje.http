@@ -29,20 +29,19 @@ Content-Type: application/json
 ###
 
 ### Actualizar un viaje existente (completo)
-PUT http://localhost:3000/api/viajes/2
+PUT http://localhost:3000/api/viajes/1
 Content-Type: application/json
 
 {
-  "fechaSalida": "2025-11-10T10:00:00.000Z",
-  "fechaLlegada": "2025-11-10T18:30:00.000Z",
+  "fechaSalida": "2024-02-01T00:00:00.000Z",
+  "fechaLlegada": "2024-02-10T00:00:00.000Z",
   "estado": "Disponible",
-  "cupos": 10,
-  "costoEstimado": 18000,
-  "descVehiculo": "Peugeot 208 azul",
-  "ciudad": 1,
-  "organizador": 3,
+  "cupos": 2,
+  "costoEstimado": 1800,
+  "descVehiculo": "Toyota Corolla gris",
+  "ciudad":2,
+  "organizador": 1,
   "categorias": [1]
-  
 }
 
 ###
