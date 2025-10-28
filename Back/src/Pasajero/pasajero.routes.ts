@@ -8,6 +8,8 @@ import {
   remove,
 } from './pasajero.controller.js';
 
+
+
 export const pasajeroRouter = Router();
 
 pasajeroRouter.get('/', findAll); // Ruta para obtener una lista de pasajeros

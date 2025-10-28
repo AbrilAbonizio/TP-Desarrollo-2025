@@ -7,8 +7,10 @@ import { pasajeroRouter } from "./Pasajero/pasajero.routes.js";
 import { categoriaRouter } from "./Categoria/categoria.routes.js";
 import { viajeRouter } from "./Viaje/viaje.routes.js";
 import { solicitudRouter } from "./Solicitud/solicitud.routes.js";
+import cors from "cors";
 
 const app = express();
+app.use(cors()); // Acepta todos los origenes, no recomendable en produccion
 app.use(express.json()); // Middleware para parsear json
 
 // luego de los middlewares base
@@ -18,6 +20,7 @@ app.use((req, res, next) => {
 });
 
 // antes e las rutas y middlewares de negocio
+
 
 app.use("/api/ciudades", ciudadRouter); // Usa ciudadRouter para manejar todas las peticiones que llegan a /api/ciudades
 app.use("/api/categorias", categoriaRouter); // Usa categoriaRouter para manejar todas las peticiones que llegan a /api/categorias
