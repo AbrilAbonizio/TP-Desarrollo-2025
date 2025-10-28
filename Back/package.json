@@ -25,7 +25,11 @@
     "@mikro-orm/core": "6.5.8",
     "@mikro-orm/mysql": "6.5.8",
     "@mikro-orm/sql-highlighter": "1.0.1",
+<<<<<<< Updated upstream
     "cors": "^2.8.5",
+=======
+    "dotenv": "^17.2.3",
+>>>>>>> Stashed changes
     "express": "^5.1.0",
     "node-cleanup": "^2.1.2",
     "reflect-metadata": "0.2.2"

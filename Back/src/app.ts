@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import "reflect-metadata";
 import { orm, syncSchema } from "./shared/orm.js";
