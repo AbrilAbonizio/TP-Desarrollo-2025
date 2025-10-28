@@ -1,15 +1,29 @@
+import './App.css';
 import NavBar from './components/NavBar.tsx';
 import GeneralCard from './components/GeneralCard.tsx';
+import PrimaryButton from './components/PrimaryButton.tsx';
 
 const cards = [
   {
     title: 'Pasajeros',
-    text: 'Contenido de la primera card',
+    text: 'Visualiza y administra los datos de todos los pasajeros registrados',
     img: '/pasajero.jpg',
   },
-  { title: 'Viajes', text: 'Contenido de la segunda card' },
-  { title: 'Ciudades', text: 'Contenido de la tercera card' },
-  { title: 'Categorias', text: 'Contenido de la cuarta card' },
+  {
+    title: 'Viajes',
+    text: 'Consulta y administra los viajes disponibles',
+    img: '/viaje.jpg',
+  },
+  {
+    title: 'Ciudades',
+    text: 'Explora y administra las ciudades de destino',
+    img: '/ciudades.jpg',
+  },
+  {
+    title: 'Categorias',
+    text: 'Organiza los viajes por categorías',
+    img: '/categorias.jpg',
+  },
 ];
 
 export default function App() {
@@ -20,7 +34,9 @@ export default function App() {
         <div className="row g-5">
           {cards.map((c, i) => (
             <div className="col-sm-6 col-md-3 mb-4" key={i}>
-              <GeneralCard title={c.title} text={c.text} img={c.img} />
+              <GeneralCard title={c.title} text={c.text} img={c.img}>
+                <PrimaryButton texto="Ver más" />
+              </GeneralCard>
             </div>
           ))}
         </div>
