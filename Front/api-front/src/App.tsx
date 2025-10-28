@@ -1,14 +1,30 @@
-import PrimaryButton from './components/PrimaryButton.tsx';
-import Card from './components/Card.tsx';
-import BarraNavegacion from './components/BarraNavegacion.tsx';
+import NavBar from './components/NavBar.tsx';
+import GeneralCard from './components/GeneralCard.tsx';
 
-function App() {
+const cards = [
+  {
+    title: 'Pasajeros',
+    text: 'Contenido de la primera card',
+    img: '/pasajero.jpg',
+  },
+  { title: 'Viajes', text: 'Contenido de la segunda card' },
+  { title: 'Ciudades', text: 'Contenido de la tercera card' },
+  { title: 'Categorias', text: 'Contenido de la cuarta card' },
+];
+
+export default function App() {
   return (
-    <Card>
-      <BarraNavegacion></BarraNavegacion>
-      <PrimaryButton texto="Ver más"></PrimaryButton>
-    </Card>
+    <>
+      <NavBar />
+      <div className="container mt-5 pt-5">
+        <div className="row g-5">
+          {cards.map((c, i) => (
+            <div className="col-sm-6 col-md-3 mb-4" key={i}>
+              <GeneralCard title={c.title} text={c.text} img={c.img} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
   );
 }
-
-export default App;
