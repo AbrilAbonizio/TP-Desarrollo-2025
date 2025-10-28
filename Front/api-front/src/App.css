@@ -37,6 +37,31 @@
   padding: 2em;
 }
 
+/* borde gris fino para tarjetas (GeneralCard usa la clase `black-border`) */
+.card.black-border {
+  border: 1px solid #d1d5db; /* gris claro */
+  box-sizing: border-box;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Alinear botones 'Ver más' al fondo de cada card */
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+.card .card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+.card .card-body > :last-child {
+  margin-top: auto;
+  align-self: center;
+}
+
 .read-the-docs {
   color: #888;
 }
