@@ -5,6 +5,7 @@ export default function NavBar() {
     <nav
       className="navbar navbar-expand-lg bg-primary fixed-top"
       data-bs-theme="dark"
+      style={{ zIndex: 1030 }}
     >
       <div className="container-fluid">
         <Link className="navbar-brand" to="/">
