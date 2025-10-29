@@ -1,20 +1,12 @@
-<<<<<<< Updated upstream
 export default function Categorias() {
-  return <h1>EN PRODUCCION</h1>;
-=======
-import { useNavigate } from "react-router-dom";
-
-export default function Categorias() {
-  const navigate = useNavigate();
-
   return (
-    <div className="container mt-5 pt-5">
-      <h1>Categorías</h1>
-      <p>Página de categorías - Aquí se mostrarán las categorías de viajes</p>
-      <button className="btn btn-primary" onClick={() => navigate("/")}>
-        Volver al inicio
-      </button>
+    <div className="container-fluid" style={{ paddingTop: "80px" }}>
+      <div className="row px-3 px-md-5">
+        <div className="col-12">
+          <h1>Categorías</h1>
+          <p>EN PRODUCCION</p>
+        </div>
+      </div>
     </div>
   );
->>>>>>> Stashed changes
 }

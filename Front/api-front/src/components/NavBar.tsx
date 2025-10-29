@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function NavBar() {
   return (
     <nav
@@ -5,9 +7,9 @@ export default function NavBar() {
       data-bs-theme="dark"
     >
       <div className="container-fluid">
-        <a className="navbar-brand" href="#">
-          Go Together
-        </a>
+        <Link className="navbar-brand" to="/">
+          Sistema de Viajes
+        </Link>
         <button
           className="navbar-toggler"
           type="button"
@@ -19,9 +21,35 @@ export default function NavBar() {
         >
           <span className="navbar-toggler-icon"></span>
         </button>
-
         <div className="collapse navbar-collapse" id="navbarColor01">
-          <ul className="navbar-nav me-auto"></ul>
+          <ul className="navbar-nav me-auto">
+            <li className="nav-item">
+              <Link className="nav-link active" to="/">
+                Inicio
+                <span className="visually-hidden">(current)</span>
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/pasajeros">
+                Pasajeros
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/viajes">
+                Viajes
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/ciudades">
+                Ciudades
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/categorias">
+                Categorías
+              </Link>
+            </li>
+          </ul>
         </div>
       </div>
     </nav>
