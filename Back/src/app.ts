@@ -14,6 +14,12 @@ const app = express();
 app.use(cors()); // Acepta todos los origenes, no recomendable en produccion
 app.use(express.json()); // Middleware para parsear json
 
+// Middleware para establecer UTF-8 en todas las respuestas
+app.use((req, res, next) => {
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  next();
+});
+
 // luego de los middlewares base
 
 app.use((req, res, next) => {

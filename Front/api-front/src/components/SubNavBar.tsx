@@ -88,7 +88,7 @@ export default function SubNavBar({
                     href="#"
                     onClick={(e) => {
                       e.preventDefault();
-                      handleConsultar();
+                      onConsultar(""); // Llamar sin ID para mostrar el formulario
                     }}
                   >
                     🔍 Buscar por ID

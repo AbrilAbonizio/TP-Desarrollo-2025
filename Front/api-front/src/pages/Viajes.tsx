@@ -81,9 +81,64 @@ export default function Viajes() {
     }
   };
 
-  const handleConsultar = async () => {
+  const handleConsultar = async (id?: string) => {
     setVistaActual("consultarUno");
     limpiarMensajes();
+
+    // Si se pasa un ID, buscarlo automáticamente
+    if (id && id.trim()) {
+      setLoading(true);
+
+      try {
+        const viaje = await viajeService.getViajeById(Number(id));
+        setFormData({
+          id: viaje.id,
+          fechaSalida: viaje.fechaSalida,
+          fechaLlegada: viaje.fechaLlegada,
+          estado: viaje.estado,
+          cupos: viaje.cupos,
+          costoEstimado: viaje.costoEstimado,
+          descVehiculo: viaje.descVehiculo,
+          idOrganizador: viaje.organizador?.id || 0,
+          idCiudad: viaje.ciudad?.id || 0,
+          categorias: viaje.categorias || [],
+        });
+        setSuccessMessage(`Viaje #${viaje.id} encontrado exitosamente`);
+        // NO limpiar searchCategoriaId aquí para que el usuario vea qué buscó
+      } catch (err) {
+        setError(`Error: ${err}`);
+        // Resetear el formulario pero mantener el searchCategoriaId para que el usuario vea qué intentó buscar
+        setFormData({
+          id: undefined,
+          fechaSalida: "",
+          fechaLlegada: "",
+          estado: "disponible",
+          cupos: 1,
+          costoEstimado: 0,
+          descVehiculo: "",
+          idOrganizador: 0,
+          idCiudad: 0,
+          categorias: [],
+        });
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      // Si no hay ID, limpiar todo para una nueva búsqueda
+      setSearchCategoriaId("");
+      setFormData({
+        id: undefined,
+        fechaSalida: "",
+        fechaLlegada: "",
+        estado: "disponible",
+        cupos: 1,
+        costoEstimado: 0,
+        descVehiculo: "",
+        idOrganizador: 0,
+        idCiudad: 0,
+        categorias: [],
+      });
+    }
   };
 
   const handleConsultarPorCategoria = async () => {
@@ -294,7 +349,7 @@ export default function Viajes() {
   };
 
   return (
-    <div style={{ paddingTop: "130px" }}>
+    <div style={{ paddingTop: "220px" }}>
       <SubNavBar
         entity="viaje"
         onConsultarTodos={handleConsultarTodos}
@@ -396,7 +451,7 @@ export default function Viajes() {
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
-                      handleBuscarModificar();
+                      handleConsultar(searchCategoriaId);
                     }}
                   >
                     <div className="mb-4">

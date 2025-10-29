@@ -1,6 +1,7 @@
 import { useState } from "react";
 import SubNavBar from "../components/SubNavBar.tsx";
 import pasajeroService, { Pasajero } from "../services/Pasajero.Service.ts";
+import solicitudService, { Solicitud } from "../services/Solicitud.Service.ts";
 
 type Vista =
   | "inicio"
@@ -27,6 +28,14 @@ export default function Pasajeros() {
   });
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [searchId, setSearchId] = useState<string>("");
+
+  // Estados para el modal de solicitudes
+  const [showSolicitudesModal, setShowSolicitudesModal] =
+    useState<boolean>(false);
+  const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
+  const [loadingSolicitudes, setLoadingSolicitudes] = useState<boolean>(false);
+  const [pasajeroSeleccionado, setPasajeroSeleccionado] =
+    useState<Pasajero | null>(null);
 
   const limpiarMensajes = () => {
     setError("");
@@ -211,8 +220,31 @@ export default function Pasajeros() {
     }
   };
 
+  const handleVerSolicitudes = async (pasajero: Pasajero) => {
+    setPasajeroSeleccionado(pasajero);
+    setShowSolicitudesModal(true);
+    setLoadingSolicitudes(true);
+
+    try {
+      const solicitudesPasajero =
+        await solicitudService.getSolicitudesByPasajero(pasajero.id!);
+      setSolicitudes(solicitudesPasajero);
+    } catch (err) {
+      console.error("Error al cargar solicitudes:", err);
+      setSolicitudes([]);
+    } finally {
+      setLoadingSolicitudes(false);
+    }
+  };
+
+  const handleCerrarModal = () => {
+    setShowSolicitudesModal(false);
+    setPasajeroSeleccionado(null);
+    setSolicitudes([]);
+  };
+
   return (
-    <div style={{ paddingTop: "130px" }}>
+    <div style={{ paddingTop: "220px" }}>
       <SubNavBar
         entity="pasajero"
         onConsultarTodos={handleConsultarTodos}
@@ -288,6 +320,13 @@ export default function Pasajeros() {
                           <br />
                           <strong>Dirección:</strong> {pasajero.direccion}
                         </p>
+                        <button
+                          type="button"
+                          className="btn btn-outline-info w-100"
+                          onClick={() => handleVerSolicitudes(pasajero)}
+                        >
+                          Ver Viajes Solicitados
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -367,10 +406,19 @@ export default function Pasajeros() {
                           <strong>Teléfono:</strong>{" "}
                           {pasajeroEncontrado.telefono}
                         </p>
-                        <p style={{ fontSize: "1.2rem", marginBottom: "0" }}>
+                        <p style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>
                           <strong>Dirección:</strong>{" "}
                           {pasajeroEncontrado.direccion}
                         </p>
+                        <button
+                          type="button"
+                          className="btn btn-outline-info"
+                          onClick={() =>
+                            handleVerSolicitudes(pasajeroEncontrado)
+                          }
+                        >
+                          Ver Viajes Solicitados
+                        </button>
                       </div>
                     </div>
                   )}
@@ -762,6 +810,157 @@ export default function Pasajeros() {
           </div>
         </div>
       </div>
+
+      {/* Modal de Solicitudes */}
+      {showSolicitudesModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+          onClick={handleCerrarModal}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              borderRadius: "10px",
+              padding: "2rem",
+              maxWidth: "90%",
+              maxHeight: "90%",
+              overflow: "auto",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "1.5rem",
+              }}
+            >
+              <h3 style={{ fontSize: "1.8rem", fontWeight: "bold", margin: 0 }}>
+                Viajes Solicitados - {pasajeroSeleccionado?.nombre}{" "}
+                {pasajeroSeleccionado?.apellido}
+              </h3>
+              <button
+                onClick={handleCerrarModal}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: "2rem",
+                  cursor: "pointer",
+                  color: "#666",
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            {loadingSolicitudes && (
+              <div style={{ textAlign: "center", padding: "2rem" }}>
+                <div className="spinner-border text-info" role="status"></div>
+                <p style={{ marginTop: "1rem", fontSize: "1.1rem" }}>
+                  Cargando solicitudes...
+                </p>
+              </div>
+            )}
+
+            {!loadingSolicitudes && solicitudes.length === 0 && (
+              <div className="alert alert-info" style={{ fontSize: "1.1rem" }}>
+                Este pasajero no tiene solicitudes de viajes.
+              </div>
+            )}
+
+            {!loadingSolicitudes && solicitudes.length > 0 && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem" }}>
+                {solicitudes.map((solicitud, index) => (
+                  <div
+                    key={index}
+                    className="card"
+                    style={{
+                      minWidth: "300px",
+                      flex: "1 1 calc(33.333% - 1.5rem)",
+                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                    }}
+                  >
+                    <div className="card-body">
+                      <h5
+                        className="card-title"
+                        style={{
+                          fontSize: "1.3rem",
+                          fontWeight: "bold",
+                          marginBottom: "1rem",
+                        }}
+                      >
+                        {solicitud.viaje.ciudad.nombre}{" "}
+                        <span
+                          style={{
+                            fontSize: "0.9rem",
+                            color: "#6c757d",
+                            fontWeight: "normal",
+                          }}
+                        >
+                          (ID: {solicitud.viaje.id})
+                        </span>
+                      </h5>
+                      <p
+                        className="card-text"
+                        style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}
+                      >
+                        <strong>Fecha Salida:</strong>{" "}
+                        {new Date(
+                          solicitud.viaje.fechaSalida
+                        ).toLocaleDateString("es-ES")}
+                      </p>
+                      <p
+                        className="card-text"
+                        style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}
+                      >
+                        <strong>Fecha Llegada:</strong>{" "}
+                        {new Date(
+                          solicitud.viaje.fechaLlegada
+                        ).toLocaleDateString("es-ES")}
+                      </p>
+                      <p
+                        className="card-text"
+                        style={{ fontSize: "1.1rem", marginBottom: "0" }}
+                      >
+                        <strong>Estado Solicitud:</strong>{" "}
+                        <span
+                          className={`badge ${
+                            solicitud.estado.toLowerCase() === "aceptada"
+                              ? "bg-success"
+                              : solicitud.estado.toLowerCase() === "pendiente"
+                              ? "bg-warning text-dark"
+                              : solicitud.estado.toLowerCase() === "rechazada"
+                              ? "bg-danger"
+                              : solicitud.estado.toLowerCase() === "cancelada"
+                              ? "bg-secondary"
+                              : "bg-info"
+                          }`}
+                          style={{ fontSize: "1rem" }}
+                        >
+                          {solicitud.estado}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
