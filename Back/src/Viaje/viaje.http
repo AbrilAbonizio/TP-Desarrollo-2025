@@ -14,7 +14,6 @@ Content-Type: application/json
 {
   "fechaSalida": "2024-01-15",
   "fechaLlegada": "2024-01-25",
-  "estado": "Pendiente",
   "cupos": 5,
   "costoEstimado": 1500.00,
   "cupoDisponible": 3,
@@ -23,7 +22,7 @@ Content-Type: application/json
   "descVehiculo": "Toyota Corolla",
   "idOrganizador": 1,
   "idCiudad": 2,
-  "categorias": [2]
+  "categorias": [1]
 }
 
 ###

@@ -55,7 +55,8 @@ async function findOne(req: Request, res: Response) {
 // Función para agregar una nueva solicitud
 async function add(req: Request, res: Response) {
   try{
-    const { fechaSolicitud, estado, idPasajero, idViaje } = req.body.sanitizedInput;
+    const { fechaSolicitud, idPasajero, idViaje } = req.body.sanitizedInput;
+    const estado = 'Pendiente';
 
     const pasajero = em.getReference(Pasajero, Number.parseInt(idPasajero));
     const viaje = await em.findOneOrFail(Viaje, Number.parseInt(idViaje), {populate: ['solicitudes']});
