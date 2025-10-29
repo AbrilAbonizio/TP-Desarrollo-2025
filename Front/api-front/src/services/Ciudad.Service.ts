@@ -1,76 +1,73 @@
-const API_URL = "http://localhost:3000/api/pasajeros";
+const API_URL = "http://localhost:3000/api/ciudades";
 
-export interface Pasajero {
+export interface Ciudad {
   id?: number;
   nombre: string;
-  apellido: string;
-  telefono: string;
-  direccion: string;
-  email: string;
+  provincia: string;
+  latitud: number;
+  longitud: number;
 }
 
-export class PasajeroService {
-  async getAllPasajeros(): Promise<Pasajero[]> {
+export class CiudadService {
+  async getAllCiudades(): Promise<Ciudad[]> {
     try {
       const response = await fetch(API_URL);
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error("Error en getAllPasajeros:", error);
+      console.error("Error en getAllCiudades:", error);
       throw error;
     }
   }
 
-  async getPasajeroById(id: number): Promise<Pasajero> {
+  async getCiudadById(id: number): Promise<Ciudad> {
     try {
-      console.log(
-        `Intentando obtener pasajero con ID ${id} desde ${API_URL}/${id}`
-      );
+      console.log(`Intentando obtener ciudad con ID ${id} desde ${API_URL}/${id}`);
       const response = await fetch(`${API_URL}/${id}`);
       console.log("Response status:", response.status);
 
       if (!response.ok) {
-        throw new Error(`Error ${response.status}: No se encontró el pasajero`);
+        throw new Error(`Error ${response.status}: No se encontró la ciudad`);
       }
 
       const result = await response.json();
       console.log("Resultado del servidor:", result);
       return result.data;
     } catch (error) {
-      console.error("Error detallado en getPasajeroById:", error);
+      console.error("Error detallado en getCiudadById:", error);
       throw error;
     }
   }
 
-  async createPasajero(pasajero: Pasajero): Promise<Pasajero> {
+  async createCiudad(ciudad: Ciudad): Promise<Ciudad> {
     const response = await fetch(API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(pasajero),
+      body: JSON.stringify(ciudad),
     });
     const result = await response.json();
     return result.data;
   }
 
-  async updatePasajero(id: number, pasajero: Pasajero): Promise<Pasajero> {
+  async updateCiudad(id: number, ciudad: Ciudad): Promise<Ciudad> {
     const response = await fetch(`${API_URL}/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(pasajero),
+      body: JSON.stringify(ciudad),
     });
     const result = await response.json();
     return result.data;
   }
 
-  async deletePasajero(id: number): Promise<void> {
+  async deleteCiudad(id: number): Promise<void> {
     await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
     });
   }
 }
 
-export default new PasajeroService();
+export default new CiudadService();

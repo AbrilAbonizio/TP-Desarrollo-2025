@@ -22,7 +22,6 @@ app.use((req, res, next) => {
 
 // antes e las rutas y middlewares de negocio
 
-
 app.use("/api/ciudades", ciudadRouter); // Usa ciudadRouter para manejar todas las peticiones que llegan a /api/ciudades
 app.use("/api/categorias", categoriaRouter); // Usa categoriaRouter para manejar todas las peticiones que llegan a /api/categorias
 app.use("/api/viajes", viajeRouter); // Usa viajesRouter para manejar todas las peticiones que llegan a /api/viajes
@@ -35,7 +34,7 @@ app.use((_, res) => {
 
 await syncSchema(); // NUNCA EN PRODUCCION
 
-app.listen(3000, '0.0.0.0', () => {
+app.listen(3000, "0.0.0.0", () => {
   console.log("Server is running on http://localhost:3000/");
   console.log("Server is also accessible from network interfaces");
 });

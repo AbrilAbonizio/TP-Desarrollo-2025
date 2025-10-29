@@ -2,14 +2,20 @@ import { useState } from "react";
 
 interface SubNavBarProps {
   entity: string;
+  onConsultarTodos: () => void;
   onConsultar: (id: string) => void;
+  onConsultarPorCategoria?: () => void;
+  onAgregar: () => void;
   onModificar: (id: string) => void;
   onEliminar: (id: string) => void;
 }
 
 export default function SubNavBar({
   entity,
+  onConsultarTodos,
   onConsultar,
+  onConsultarPorCategoria,
+  onAgregar,
   onModificar,
   onEliminar,
 }: SubNavBarProps) {
@@ -18,18 +24,6 @@ export default function SubNavBar({
   const handleConsultar = () => {
     if (searchId.trim()) {
       onConsultar(searchId);
-    }
-  };
-
-  const handleModificar = () => {
-    if (searchId.trim()) {
-      onModificar(searchId);
-    }
-  };
-
-  const handleEliminar = () => {
-    if (searchId.trim()) {
-      onEliminar(searchId);
     }
   };
 
@@ -68,10 +62,65 @@ export default function SubNavBar({
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  handleConsultar();
+                  onConsultarTodos();
                 }}
               >
-                Consultar
+                Consultar Todos
+              </a>
+            </li>
+
+            {/* Dropdown para "Consultar Uno" */}
+            <li className="nav-item dropdown">
+              <a
+                className="nav-link dropdown-toggle"
+                href="#"
+                id="consultarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Consultar Uno
+              </a>
+              <ul className="dropdown-menu" aria-labelledby="consultarDropdown">
+                <li>
+                  <a
+                    className="dropdown-item"
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleConsultar();
+                    }}
+                  >
+                    🔍 Buscar por ID
+                  </a>
+                </li>
+                {onConsultarPorCategoria && (
+                  <li>
+                    <a
+                      className="dropdown-item"
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onConsultarPorCategoria();
+                      }}
+                    >
+                      🏷️ Buscar por Categoría
+                    </a>
+                  </li>
+                )}
+              </ul>
+            </li>
+
+            <li className="nav-item">
+              <a
+                className="nav-link"
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onAgregar();
+                }}
+              >
+                Agregar
               </a>
             </li>
             <li className="nav-item">
@@ -80,7 +129,7 @@ export default function SubNavBar({
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  handleModificar();
+                  onModificar("");
                 }}
               >
                 Modificar
@@ -92,7 +141,7 @@ export default function SubNavBar({
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  handleEliminar();
+                  onEliminar("");
                 }}
               >
                 Eliminar
