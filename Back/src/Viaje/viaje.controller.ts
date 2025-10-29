@@ -67,6 +67,7 @@ async function add(req: Request, res: Response) {
   try {
 
     const {idOrganizador, idCiudad} = req.body.sanitizedInput
+    const estado = 'Disponible';
 
     // En el front se va a mostrar una lista de categorias, osea que va a estar limitado a solo
     // esas categorias que se encuentran en la BD, por lo tanto no es necesario validar
@@ -79,7 +80,7 @@ async function add(req: Request, res: Response) {
     // Obtiene referencias a cada categoria
     const categorias = req.body.sanitizedInput.categorias?.map((id: number) =>em.getReference(Categoria, id)) || [];
 
-    const viaje = em.create(Viaje, {organizador, ciudad, categorias, ...req.body.sanitizedInput});
+    const viaje = em.create(Viaje, {organizador, ciudad, categorias, estado, ...req.body.sanitizedInput});
     await em.flush();
     return res.status(201).json({ message: "Viaje created", data: viaje });
 
