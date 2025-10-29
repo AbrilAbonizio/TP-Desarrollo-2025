@@ -1,37 +1,36 @@
-import SubNavBar from "../components/SubNavBar.tsx";
+import { useEffect, useState } from 'react';
+import { getAllPasajeros } from '../services/Pasajero.Service.ts';
+import { Pasajero } from '../types/Pasajero.ts';
 
 export default function Pasajeros() {
-  const handleConsultar = (id: string) => {
-    console.log("Consultar pasajero con ID:", id);
-    // Aquí irá la lógica para obtener un pasajero por ID
-  };
+  const [pasajeros, setPasajeros] = useState<Pasajero[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleModificar = (id: string) => {
-    console.log("Modificar pasajero con ID:", id);
-    // Aquí irá la lógica para modificar un pasajero
-  };
+  useEffect(() => {
+    getAllPasajeros()
+      .then((res) => {
+        console.log('Datos recibidos:', res.data);
+        setPasajeros(res.data);
+      })
+      .catch((err) => setError((err as Error)?.message ?? String(err)))
+      .finally(() => setLoading(false));
+  }, []);
 
-  const handleEliminar = (id: string) => {
-    console.log("Eliminar pasajero con ID:", id);
-    // Aquí irá la lógica para eliminar un pasajero
-  };
+  if (loading) return <p>Cargando pasajeros...</p>;
+  if (error) return <p>Error: {error}</p>;
 
+  console.log(pasajeros);
   return (
-    <div style={{ paddingTop: "130px" }}>
-      <SubNavBar
-        entity="pasajero"
-        onConsultar={handleConsultar}
-        onModificar={handleModificar}
-        onEliminar={handleEliminar}
-      />
-      <div className="container-fluid px-3 px-md-5 mt-4">
-        <div className="row">
-          <div className="col-12">
-            <h1>Pasajeros</h1>
-            <p>EN PRODUCCION</p>
-          </div>
-        </div>
-      </div>
+    <div className="container mt-4">
+      <h2>Lista de pasajeros</h2>
+      <ul className="list-group">
+        {pasajeros.map((p) => (
+          <li key={p.id} className="list-group-item">
+            {p.nombre} {p.apellido} - {p.email ?? 'sin email'}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
