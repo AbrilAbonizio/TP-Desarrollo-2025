@@ -1,10 +1,14 @@
 interface PrimaryButtonProps {
   texto: string;
-  //handleClick:
+  onClick?: () => void;
 }
 
-function PrimaryButton({ texto }: PrimaryButtonProps) {
-  return <button className="btn btn-primary">{texto}</button>;
+function PrimaryButton({ texto, onClick }: PrimaryButtonProps) {
+  return (
+    <button className="btn btn-primary" onClick={onClick}>
+      {texto}
+    </button>
+  );
 }
 
 export default PrimaryButton;
