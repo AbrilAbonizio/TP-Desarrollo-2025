@@ -73,7 +73,7 @@ Crear un archivo .env dentro de la carpeta /Back con las siguientes variables:
 
 # Si usas Docker
     ```bash
-    DB_HOST=localhost        # o el nombre del servicio en docker-compose
+    DB_HOST=localhost 
     DB_USER=dsw
     DB_PASSWORD=dsw
     DB_NAME=dsw
