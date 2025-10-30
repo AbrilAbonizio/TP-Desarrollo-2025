@@ -45,9 +45,26 @@ export default function Ciudades() {
     }
   };
 
-  const handleConsultar = async () => {
+  const handleConsultar = async (id?: string) => {
     setVistaActual("consultarUno");
     limpiarMensajes();
+
+    // Si se pasa un ID, buscarlo automáticamente
+    if (id && id.trim()) {
+      setLoading(true);
+      setSearchId(id);
+
+      try {
+        const ciudad = await ciudadService.getCiudadById(Number(id));
+        setCiudadEncontrada(ciudad);
+        setSuccessMessage(`Ciudad #${ciudad.id} encontrada exitosamente`);
+      } catch (err) {
+        setError(`Error: ${err}`);
+        setCiudadEncontrada(null);
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   const handleBuscarUno = async () => {
@@ -175,7 +192,7 @@ export default function Ciudades() {
   };
 
   return (
-    <div style={{ paddingTop: "130px" }}>
+    <div style={{ paddingTop: "220px" }}>
       <SubNavBar
         entity="ciudad"
         onConsultarTodos={handleConsultarTodos}

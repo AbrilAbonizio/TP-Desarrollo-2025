@@ -9,6 +9,10 @@ export interface Pasajero {
   email: string;
 }
 
+interface ApiError extends Error {
+  response?: Response;
+}
+
 export class PasajeroService {
   async getAllPasajeros(): Promise<Pasajero[]> {
     try {
@@ -67,9 +71,16 @@ export class PasajeroService {
   }
 
   async deletePasajero(id: number): Promise<void> {
-    await fetch(`${API_URL}/${id}`, {
+    const response = await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
     });
+    
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      const error = new Error(data.message || `Error ${response.status}`) as ApiError;
+      error.response = response;
+      throw error;
+    }
   }
 }
 

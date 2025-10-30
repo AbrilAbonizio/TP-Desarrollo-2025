@@ -100,8 +100,7 @@ async function update(req: Request, res: Response) {
   try {
     const id = Number.parseInt(req.params.id);
     const viaje = await em.findOneOrFail(Viaje, id, {populate: ["organizador", "ciudad", "categorias"]});
-    em.assign(viaje, req.body.sanitizedInput); // VER COMO HACER PARA AGREGARLE UNA CATEGORIA Y NO QUE SE BORRE TODO
-    await em.flush();
+    em.assign(viaje, req.body.sanitizedInput); 
     return res.status(200).send({ message: "Viaje updated", data: viaje });
   } 
   catch (error: any) {

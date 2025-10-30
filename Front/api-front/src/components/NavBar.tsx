@@ -9,7 +9,7 @@ export default function NavBar() {
     >
       <div className="container-fluid">
         <Link className="navbar-brand" to="/">
-          Sistema de Viajes
+          Go Together
         </Link>
         <button
           className="navbar-toggler"

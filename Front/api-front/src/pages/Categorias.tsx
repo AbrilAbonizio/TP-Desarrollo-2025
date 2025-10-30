@@ -43,9 +43,26 @@ export default function Categorias() {
   };
 
   // Consultar uno
-  const handleConsultar = async () => {
+  const handleConsultar = async (id?: string) => {
     setVistaActual("consultarUno");
     limpiarMensajes();
+
+    // Si se pasa un ID, buscarlo automáticamente
+    if (id && id.trim()) {
+      setLoading(true);
+      setSearchId(id);
+
+      try {
+        const categoria = await categoriaService.getCategoriaById(Number(id));
+        setCategoriaEncontrada(categoria);
+        setSuccessMessage(`Categoría #${categoria.id} encontrada exitosamente`);
+      } catch (err) {
+        setError(`Error: ${err}`);
+        setCategoriaEncontrada(null);
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   const handleBuscarUno = async () => {
@@ -182,7 +199,7 @@ export default function Categorias() {
   };
 
   return (
-    <div style={{ paddingTop: "130px" }}>
+    <div style={{ paddingTop: "220px" }}>
       <SubNavBar
         entity="categoría"
         onConsultarTodos={handleConsultarTodos}
@@ -241,15 +258,29 @@ export default function Categorias() {
                     key={cat.id}
                     className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4"
                   >
-                    <div className="card h-100 shadow">
-                      <div className="card-body">
+                    <div 
+                      className="card shadow" 
+                      style={{
+                        minHeight: "160px",
+                        maxHeight: "200px",
+                        display: "flex",
+                        flexDirection: "column"
+                      }}
+                    >
+                      <div className="card-body d-flex flex-column">
                         <h5
-                          className="card-title"
+                          className="card-title mb-3"
                           style={{ fontSize: "1.5rem", fontWeight: "bold" }}
                         >
                           ID: {cat.id}
                         </h5>
-                        <p className="card-text" style={{ fontSize: "1.2rem" }}>
+                        <p 
+                          className="card-text flex-grow-1" 
+                          style={{ 
+                            fontSize: "1.2rem",
+                            overflow: "auto"
+                          }}
+                        >
                           {cat.descripcion}
                         </p>
                       </div>

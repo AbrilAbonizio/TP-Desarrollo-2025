@@ -21,9 +21,11 @@ export default function SubNavBar({
 }: SubNavBarProps) {
   const [searchId, setSearchId] = useState("");
 
-  const handleConsultar = () => {
+  const handleConsultar = (e: React.FormEvent) => {
+    e.preventDefault();
     if (searchId.trim()) {
       onConsultar(searchId);
+      setSearchId(""); // Limpiar el campo después de buscar
     }
   };
 
@@ -150,10 +152,7 @@ export default function SubNavBar({
           </ul>
           <form
             className="d-flex"
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleConsultar();
-            }}
+            onSubmit={handleConsultar}
           >
             <input
               className="form-control me-sm-2"

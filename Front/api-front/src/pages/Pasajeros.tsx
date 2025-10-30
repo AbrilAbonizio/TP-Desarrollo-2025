@@ -57,9 +57,29 @@ export default function Pasajeros() {
     }
   };
 
-  const handleConsultar = async () => {
-    setVistaActual("consultarUno");
+  const handleConsultar = async (id?: string) => {
     limpiarMensajes();
+    setVistaActual("consultarUno");
+    
+    if (id && id.trim()) {
+      setLoading(true);
+      setSearchId(id);
+
+      try {
+        const pasajero = await pasajeroService.getPasajeroById(Number(id));
+        setPasajeroEncontrado(pasajero);
+        setSuccessMessage(`Pasajero #${pasajero.id} encontrado exitosamente`);
+      } catch (err) {
+        setError(`Error: ${err}`);
+        setPasajeroEncontrado(null);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      // Si no hay ID, solo limpiamos los estados pero mantenemos la vista de búsqueda
+      setSearchId("");
+      setPasajeroEncontrado(null);
+    }
   };
 
   const handleBuscarUno = async () => {
@@ -214,7 +234,13 @@ export default function Pasajeros() {
       setSuccessMessage(`Pasajero ${searchId} eliminado exitosamente`);
       setSearchId("");
     } catch (err) {
-      setError(`Error: ${err}`);
+      const error = err as Error & { response?: Response };
+      // Si el error es 404 (no encontrado), mostrar un mensaje más amigable
+      if (error.response?.status === 404) {
+        setError(`No existe un pasajero con el ID ${searchId}`);
+      } else {
+        setError(`Error: ${error.message}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -248,7 +274,7 @@ export default function Pasajeros() {
       <SubNavBar
         entity="pasajero"
         onConsultarTodos={handleConsultarTodos}
-        onConsultar={handleConsultar}
+        onConsultar={(id) => handleConsultar(id)}
         onAgregar={handleAgregar}
         onModificar={handleModificar}
         onEliminar={handleEliminar}
@@ -301,7 +327,7 @@ export default function Pasajeros() {
                 {pasajeros.map((pasajero) => (
                   <div
                     key={pasajero.id}
-                    className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4"
+                    className="col-12 col-sm-6 col-md-6 col-lg-4 mb-4"
                   >
                     <div className="card h-100 shadow">
                       <div className="card-body">
@@ -499,27 +525,37 @@ export default function Pasajeros() {
                           style={{ fontSize: "1.1rem" }}
                         />
                       </div>
-                      <div className="col-md-6 mb-4">
-                        <label
-                          className="form-label"
-                          style={{ fontSize: "1.2rem", fontWeight: "500" }}
-                        >
-                          Teléfono
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control form-control-lg"
-                          value={formData.telefono}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              telefono: e.target.value,
-                            })
-                          }
-                          placeholder="Ingrese el teléfono"
-                          style={{ fontSize: "1.1rem" }}
-                        />
-                      </div>
+                        <div className="col-md-6 mb-4">
+                          <label
+                            className="form-label"
+                            style={{ fontSize: "1.2rem", fontWeight: "500" }}
+                          >
+                            Teléfono
+                          </label>
+                          <input
+                            type="tel"
+                            className="form-control form-control-lg"
+                            value={formData.telefono}
+                            onChange={(e) => {
+                              // Remover cualquier caracter que no sea número
+                              const numerosOnly = e.target.value.replace(/\D/g, '');
+                              setFormData({
+                                ...formData,
+                                telefono: numerosOnly,
+                              });
+                            }}
+                            onKeyPress={(e) => {
+                              // Prevenir la entrada de caracteres no numéricos
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            placeholder="Ingrese el teléfono (solo números)"
+                            style={{ fontSize: "1.1rem" }}
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                          />
+                        </div>
                     </div>
                     <div className="mb-4">
                       <label
@@ -696,16 +732,27 @@ export default function Pasajeros() {
                             Teléfono
                           </label>
                           <input
-                            type="text"
+                            type="tel"
                             className="form-control form-control-lg"
                             value={formData.telefono}
-                            onChange={(e) =>
+                            onChange={(e) => {
+                              // Remover cualquier caracter que no sea número
+                              const numerosOnly = e.target.value.replace(/\D/g, '');
                               setFormData({
                                 ...formData,
-                                telefono: e.target.value,
-                              })
-                            }
+                                telefono: numerosOnly,
+                              });
+                            }}
+                            onKeyPress={(e) => {
+                              // Prevenir la entrada de caracteres no numéricos
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            placeholder="Ingrese el teléfono (solo números)"
                             style={{ fontSize: "1.1rem" }}
+                            inputMode="numeric"
+                            pattern="[0-9]*"
                           />
                         </div>
                       </div>

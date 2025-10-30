@@ -34,6 +34,28 @@ class SolicitudService {
       throw error;
     }
   }
+
+  async createSolicitud(solicitud: { idViaje: number; idPasajero: number; fechaSolicitud: string; estado: string }): Promise<Solicitud> {
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(solicitud),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error("Error creating solicitud:", error);
+      throw error;
+    }
+  }
 }
 
 export default new SolicitudService();

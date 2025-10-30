@@ -4,6 +4,7 @@ import viajeService, { Viaje } from "../services/Viaje.Service.ts";
 import ciudadService, { Ciudad } from "../services/Ciudad.Service.ts";
 import pasajeroService, { Pasajero } from "../services/Pasajero.Service.ts";
 import categoriaService, { Categoria } from "../services/Categoria.Service.ts";
+import solicitudService from "../services/Solicitud.Service.ts";
 
 type Vista =
   | "inicio"
@@ -35,10 +36,78 @@ export default function Viajes() {
   const [searchCategoriaId, setSearchCategoriaId] = useState<string>("");
   const [searchCategoriaTexto, setSearchCategoriaTexto] = useState<string>("");
 
+  // Estados para el modal de solicitud
+  const [showSolicitudModal, setShowSolicitudModal] = useState<boolean>(false);
+  const [viajeSeleccionado, setViajeSeleccionado] = useState<number | null>(null);
+  const [pasajeroId, setPasajeroId] = useState<string>("");
+
   // Estados para los selectores
   const [ciudades, setCiudades] = useState<Ciudad[]>([]);
   const [pasajeros, setPasajeros] = useState<Pasajero[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
+
+  const handleAbrirModalSolicitud = (viajeId: number) => {
+    setViajeSeleccionado(viajeId);
+    setPasajeroId("");
+    setShowSolicitudModal(true);
+    limpiarMensajes();
+  };
+
+  const handleCerrarModalSolicitud = () => {
+    setShowSolicitudModal(false);
+    setViajeSeleccionado(null);
+    setPasajeroId("");
+  };
+
+  const handleRealizarSolicitud = async () => {
+    if (!viajeSeleccionado || !pasajeroId.trim()) {
+      setError("Por favor, ingrese su ID de pasajero");
+      return;
+    }
+
+    setLoading(true);
+    limpiarMensajes();
+
+    try {
+      // Primero verificamos que el pasajero exista
+      try {
+        await pasajeroService.getPasajeroById(Number(pasajeroId));
+      } catch (err) {
+        setError("El ID de pasajero ingresado no existe");
+        setLoading(false);
+        return;
+      }
+
+      // Verificamos que no exista una solicitud pendiente para este viaje y pasajero
+      const solicitudesExistentes = await solicitudService.getSolicitudesByPasajero(Number(pasajeroId));
+      const solicitudExistente = solicitudesExistentes.find(
+        s => s.viaje.id === viajeSeleccionado && 
+            (s.estado.toLowerCase() === "pendiente" || s.estado.toLowerCase() === "aceptada")
+      );
+
+      if (solicitudExistente) {
+        setError(solicitudExistente.estado.toLowerCase() === "pendiente" 
+          ? "Ya tienes una solicitud pendiente para este viaje" 
+          : "Ya tienes una solicitud aceptada para este viaje");
+        setLoading(false);
+        return;
+      }
+
+      const solicitud = {
+        idViaje: viajeSeleccionado,
+        idPasajero: Number(pasajeroId),
+        fechaSolicitud: new Date().toISOString(),
+        estado: "pendiente"
+      };
+
+      await solicitudService.createSolicitud(solicitud);
+      setSuccessMessage(`Solicitud creada exitosamente para el viaje #${viajeSeleccionado}`);
+    } catch (err) {
+      setError(`Error al crear la solicitud: ${err}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Cargar datos para los selectores
   useEffect(() => {
@@ -407,33 +476,42 @@ export default function Viajes() {
                     key={viaje.id}
                     className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4"
                   >
-                    <div className="card h-100 shadow">
-                      <div className="card-body">
+                    <div className="card h-100">
+                      <div className="card-body d-flex flex-column">
                         <h5
-                          className="card-title"
+                          className="card-title mb-3"
                           style={{ fontSize: "1.5rem", fontWeight: "bold" }}
                         >
                           Viaje #{viaje.id}
                         </h5>
-                        <p className="card-text" style={{ fontSize: "1.1rem" }}>
-                          <strong>Ciudad:</strong> {viaje.ciudad?.nombre}
-                          <br />
-                          <strong>Organizador:</strong>{" "}
-                          {viaje.organizador?.nombre}{" "}
-                          {viaje.organizador?.apellido}
-                          <br />
-                          <strong>Salida:</strong>{" "}
-                          {new Date(viaje.fechaSalida).toLocaleDateString()}
-                          <br />
-                          <strong>Llegada:</strong>{" "}
-                          {new Date(viaje.fechaLlegada).toLocaleDateString()}
-                          <br />
-                          <strong>Estado:</strong> {viaje.estado}
-                          <br />
-                          <strong>Cupos:</strong> {viaje.cupos}
-                          <br />
-                          <strong>Costo:</strong> ${viaje.costoEstimado}
-                        </p>
+                        <div className="flex-grow-1">
+                          <p className="card-text mb-0" style={{ fontSize: "1.1rem" }}>
+                            <strong>Ciudad:</strong> {viaje.ciudad?.nombre}
+                            <br />
+                            <strong>Organizador:</strong>{" "}
+                            {viaje.organizador?.nombre}{" "}
+                            {viaje.organizador?.apellido}
+                            <br />
+                            <strong>Salida:</strong>{" "}
+                            {new Date(viaje.fechaSalida).toLocaleDateString()}
+                            <br />
+                            <strong>Llegada:</strong>{" "}
+                            {new Date(viaje.fechaLlegada).toLocaleDateString()}
+                            <br />
+                            <strong>Estado:</strong> {viaje.estado}
+                            <br />
+                            <strong>Cupos:</strong> {viaje.cupos}
+                            <br />
+                            <strong>Costo:</strong> ${viaje.costoEstimado}
+                          </p>
+                        </div>
+                        <button
+                          className="btn btn-success w-100 mt-3"
+                          onClick={() => handleAbrirModalSolicitud(viaje.id!)}
+                          disabled={loading}
+                        >
+                          {loading ? "Procesando..." : "Realizar Solicitud"}
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -684,10 +762,10 @@ export default function Viajes() {
                             key={viaje.id}
                             className="col-12 col-md-6 col-lg-4 mb-4"
                           >
-                            <div className="card h-100 shadow border-primary">
-                              <div className="card-body">
+                            <div className="card h-100 border-primary">
+                              <div className="card-body d-flex flex-column">
                                 <h6
-                                  className="card-title"
+                                  className="card-title mb-3"
                                   style={{
                                     fontSize: "1.4rem",
                                     fontWeight: "bold",
@@ -697,83 +775,40 @@ export default function Viajes() {
                                   Viaje #{viaje.id}
                                 </h6>
                                 <hr />
-                                <p
-                                  style={{
-                                    fontSize: "1.1rem",
-                                    marginBottom: "0.5rem",
-                                  }}
+                                <div className="flex-grow-1">
+                                  <div className="mb-3">
+                                    <strong>Ciudad:</strong> {viaje.ciudad?.nombre}
+                                    <br />
+                                    <strong>Organizador:</strong>{" "}
+                                    {viaje.organizador?.nombre}{" "}
+                                    {viaje.organizador?.apellido}
+                                    <br />
+                                    <strong>Salida:</strong>{" "}
+                                    {new Date(viaje.fechaSalida).toLocaleDateString()}
+                                    <br />
+                                    <strong>Llegada:</strong>{" "}
+                                    {new Date(viaje.fechaLlegada).toLocaleDateString()}
+                                    <br />
+                                    <strong>Estado:</strong>{" "}
+                                    <span className="badge bg-success">
+                                      {viaje.estado}
+                                    </span>
+                                    <br />
+                                    <strong>Cupos:</strong> {viaje.cupos}
+                                    <br />
+                                    <strong>Costo:</strong> ${viaje.costoEstimado}
+                                    <br />
+                                    <strong>Vehículo:</strong>{" "}
+                                    {viaje.descVehiculo}
+                                  </div>
+                                </div>
+                                <button
+                                  className="btn btn-success w-100 mt-3"
+                                  onClick={() => handleAbrirModalSolicitud(viaje.id!)}
+                                  disabled={loading}
                                 >
-                                  <strong>Ciudad:</strong>{" "}
-                                  {viaje.ciudad?.nombre}
-                                </p>
-                                <p
-                                  style={{
-                                    fontSize: "1.1rem",
-                                    marginBottom: "0.5rem",
-                                  }}
-                                >
-                                  <strong>Organizador:</strong>{" "}
-                                  {viaje.organizador?.nombre}{" "}
-                                  {viaje.organizador?.apellido}
-                                </p>
-                                <p
-                                  style={{
-                                    fontSize: "1.1rem",
-                                    marginBottom: "0.5rem",
-                                  }}
-                                >
-                                  <strong>Salida:</strong>{" "}
-                                  {new Date(
-                                    viaje.fechaSalida
-                                  ).toLocaleDateString()}
-                                </p>
-                                <p
-                                  style={{
-                                    fontSize: "1.1rem",
-                                    marginBottom: "0.5rem",
-                                  }}
-                                >
-                                  <strong>Llegada:</strong>{" "}
-                                  {new Date(
-                                    viaje.fechaLlegada
-                                  ).toLocaleDateString()}
-                                </p>
-                                <p
-                                  style={{
-                                    fontSize: "1.1rem",
-                                    marginBottom: "0.5rem",
-                                  }}
-                                >
-                                  <strong>Estado:</strong>{" "}
-                                  <span className="badge bg-success">
-                                    {viaje.estado}
-                                  </span>
-                                </p>
-                                <p
-                                  style={{
-                                    fontSize: "1.1rem",
-                                    marginBottom: "0.5rem",
-                                  }}
-                                >
-                                  <strong>Cupos:</strong> {viaje.cupos}
-                                </p>
-                                <p
-                                  style={{
-                                    fontSize: "1.1rem",
-                                    marginBottom: "0.5rem",
-                                  }}
-                                >
-                                  <strong>Costo:</strong> ${viaje.costoEstimado}
-                                </p>
-                                <p
-                                  style={{
-                                    fontSize: "1.1rem",
-                                    marginBottom: "0",
-                                  }}
-                                >
-                                  <strong>Vehículo:</strong>{" "}
-                                  {viaje.descVehiculo}
-                                </p>
+                                  {loading ? "Procesando..." : "Realizar Solicitud"}
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -1367,6 +1402,111 @@ export default function Viajes() {
           </div>
         </div>
       </div>
+
+      {/* Modal de Solicitud */}
+      {showSolicitudModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+          onClick={handleCerrarModalSolicitud}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              borderRadius: "10px",
+              padding: "2rem",
+              maxWidth: "90%",
+              maxHeight: "90%",
+              overflow: "auto",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+              minWidth: "400px",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "1.5rem",
+              }}
+            >
+              <h3 style={{ fontSize: "1.8rem", fontWeight: "bold", margin: 0 }}>
+                Realizar Solicitud - Viaje #{viajeSeleccionado}
+              </h3>
+              <button
+                onClick={handleCerrarModalSolicitud}
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: "2rem",
+                  cursor: "pointer",
+                  color: "#666",
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              handleRealizarSolicitud();
+            }}>
+              <div className="mb-4">
+                <label
+                  className="form-label"
+                  style={{ fontSize: "1.2rem", fontWeight: "500" }}
+                >
+                  ID de Pasajero
+                </label>
+                <input
+                  type="number"
+                  className="form-control form-control-lg"
+                  placeholder="Ingrese su ID de pasajero"
+                  value={pasajeroId}
+                  onChange={(e) => setPasajeroId(e.target.value)}
+                  style={{ fontSize: "1.1rem" }}
+                />
+              </div>
+              <button
+                type="submit"
+                className="btn btn-success btn-lg w-100"
+                style={{ fontSize: "1.2rem" }}
+                disabled={loading}
+              >
+                {loading ? "Procesando..." : "Confirmar Solicitud"}
+              </button>
+            </form>
+            
+            {error && (
+              <div
+                className="alert alert-danger mt-3"
+                style={{ fontSize: "1.1rem" }}
+              >
+                {error}
+              </div>
+            )}
+            {successMessage && (
+              <div
+                className="alert alert-success mt-3"
+                style={{ fontSize: "1.1rem" }}
+              >
+                {successMessage}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
