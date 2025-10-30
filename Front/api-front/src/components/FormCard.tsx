@@ -17,7 +17,7 @@ export default function FormCard({
 }: FormCardProps) {
   return (
     <div
-      className={`card mt-4 shadow-lg ${
+      className={`card mt-4 shadow-extra-dark ${
         borderColor ? `border-${borderColor}` : ""
       }`}
     >

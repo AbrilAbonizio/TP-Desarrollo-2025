@@ -336,11 +336,18 @@ export default function Pasajeros() {
                       <div className="card-body">
                         <h5
                           className="card-title"
-                          style={{ fontSize: "1.5rem", fontWeight: "bold" }}
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#000",
+                          }}
                         >
                           {pasajero.nombre} {pasajero.apellido}
                         </h5>
-                        <p className="card-text" style={{ fontSize: "1.1rem" }}>
+                        <p
+                          className="card-text"
+                          style={{ fontSize: "1.1rem", color: "#000" }}
+                        >
                           <strong>ID:</strong> {pasajero.id}
                           <br />
                           <strong>Email:</strong> {pasajero.email}

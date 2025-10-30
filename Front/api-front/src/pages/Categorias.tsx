@@ -271,7 +271,11 @@ export default function Categorias() {
                       <div className="card-body d-flex flex-column">
                         <h5
                           className="card-title mb-3"
-                          style={{ fontSize: "1.5rem", fontWeight: "bold" }}
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#000",
+                          }}
                         >
                           ID: {cat.id}
                         </h5>
@@ -280,6 +284,7 @@ export default function Categorias() {
                           style={{
                             fontSize: "1.2rem",
                             overflow: "auto",
+                            color: "#000",
                           }}
                         >
                           {cat.descripcion}

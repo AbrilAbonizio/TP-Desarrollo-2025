@@ -9,7 +9,7 @@ interface CardProps {
 
 export default function Card({ title, text, img, children }: CardProps) {
   return (
-    <div className="card h-100 shadow-sm">
+    <div className="card h-100 shadow-extra-dark">
       {img && (
         <img
           src={img}

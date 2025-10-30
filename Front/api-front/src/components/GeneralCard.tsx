@@ -28,7 +28,7 @@ export default function GeneralCard({
   titleColor = "#0d6efd",
 }: GeneralCardProps) {
   return (
-    <div className={`card mt-4 ${bgColor}`}>
+    <div className={`card mt-4 shadow-extra-dark ${bgColor}`}>
       <div className="card-body">
         {title && (
           <h5 style={{ fontSize: "1.5rem", color: titleColor }}>{title}</h5>
