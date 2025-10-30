@@ -46,7 +46,7 @@ export default function Principal() {
               <PrimaryButton
                 texto="Ver más"
                 onClick={c.onClick}
-                color="light"
+                color="primary"
               />
             </Card>
           </div>

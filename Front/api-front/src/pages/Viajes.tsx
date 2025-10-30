@@ -36,6 +36,7 @@ export default function Viajes() {
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [searchCategoriaId, setSearchCategoriaId] = useState<string>("");
   const [searchCategoriaTexto, setSearchCategoriaTexto] = useState<string>("");
+  const [dateError, setDateError] = useState<string>("");
 
   // Estados para el modal de solicitud
   const [showSolicitudModal, setShowSolicitudModal] = useState<boolean>(false);
@@ -143,6 +144,7 @@ export default function Viajes() {
   const limpiarMensajes = () => {
     setError("");
     setSuccessMessage("");
+    setDateError("");
   };
 
   const handleConsultarTodos = async () => {
@@ -283,6 +285,19 @@ export default function Viajes() {
       setError("Todos los campos son obligatorios");
       return;
     }
+    // Validación adicional: fechaLlegada debe ser igual o posterior a fechaSalida
+    const salida = new Date(formData.fechaSalida);
+    const llegada = new Date(formData.fechaLlegada);
+    if (isNaN(salida.getTime()) || isNaN(llegada.getTime())) {
+      setError("");
+      setDateError("Formato de fecha inválido");
+      return;
+    }
+    if (llegada < salida) {
+      setError("");
+      setDateError("La Fecha de llegada debe ser igual o posterior a la Fecha de salida");
+      return;
+    }
 
     setLoading(true);
     limpiarMensajes();
@@ -371,6 +386,20 @@ export default function Viajes() {
       return;
     }
 
+    // Validación adicional: fechaLlegada debe ser igual o posterior a fechaSalida
+    const salida = new Date(formData.fechaSalida);
+    const llegada = new Date(formData.fechaLlegada);
+    if (isNaN(salida.getTime()) || isNaN(llegada.getTime())) {
+      setError("");
+      setDateError("Formato de fecha inválido");
+      return;
+    }
+    if (llegada < salida) {
+      setError("");
+      setDateError("La Fecha de llegada debe ser igual o posterior a la Fecha de salida");
+      return;
+    }
+
     setLoading(true);
     limpiarMensajes();
 
@@ -456,7 +485,7 @@ export default function Viajes() {
               </div>
             )}
 
-            {error && (
+            {error && !dateError && (
               <div
                 className="alert alert-danger mt-4"
                 style={{ fontSize: "1.1rem" }}
@@ -856,7 +885,7 @@ export default function Viajes() {
                           className="form-label"
                           style={{ fontSize: "1.2rem", fontWeight: "500" }}
                         >
-                          Organizador *
+                          Organizador 
                         </label>
                         <select
                           className="form-select form-select-lg"
@@ -882,7 +911,7 @@ export default function Viajes() {
                           className="form-label"
                           style={{ fontSize: "1.2rem", fontWeight: "500" }}
                         >
-                          Ciudad *
+                          Ciudad 
                         </label>
                         <select
                           className="form-select form-select-lg"
@@ -910,17 +939,19 @@ export default function Viajes() {
                           className="form-label"
                           style={{ fontSize: "1.2rem", fontWeight: "500" }}
                         >
-                          Fecha Salida *
+                          Fecha Salida 
                         </label>
                         <input
                           type="datetime-local"
                           className="form-control form-control-lg"
                           value={formData.fechaSalida}
-                          onChange={(e) =>
+                          onChange={(e) => {
+                            setDateError("");
                             setFormData({
                               ...formData,
                               fechaSalida: e.target.value,
-                            })
+                            });
+                          }
                           }
                           style={{ fontSize: "1.1rem" }}
                         />
@@ -930,22 +961,32 @@ export default function Viajes() {
                           className="form-label"
                           style={{ fontSize: "1.2rem", fontWeight: "500" }}
                         >
-                          Fecha Llegada *
+                          Fecha Llegada 
                         </label>
                         <input
                           type="datetime-local"
                           className="form-control form-control-lg"
                           value={formData.fechaLlegada}
-                          onChange={(e) =>
+                          onChange={(e) => {
+                            setDateError("");
                             setFormData({
                               ...formData,
                               fechaLlegada: e.target.value,
-                            })
+                            });
+                          }
                           }
                           style={{ fontSize: "1.1rem" }}
                         />
                       </div>
                     </div>
+                    {dateError && (
+                      <div
+                        className="text-danger mb-3"
+                        style={{ fontSize: "0.95rem", textAlign: "left" }}
+                      >
+                        {dateError}
+                      </div>
+                    )}
                     <div className="row">
                       <div className="col-md-6 mb-4">
                         <label
@@ -1184,11 +1225,13 @@ export default function Viajes() {
                             type="datetime-local"
                             className="form-control form-control-lg"
                             value={formData.fechaSalida}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                fechaSalida: e.target.value,
-                              })
+                              onChange={(e) => {
+                                setDateError("");
+                                setFormData({
+                                  ...formData,
+                                  fechaSalida: e.target.value,
+                                });
+                              }
                             }
                             style={{ fontSize: "1.1rem" }}
                           />
@@ -1204,12 +1247,14 @@ export default function Viajes() {
                             type="datetime-local"
                             className="form-control form-control-lg"
                             value={formData.fechaLlegada}
-                            onChange={(e) =>
+                            onChange={(e) => {
+                              setDateError("");
                               setFormData({
                                 ...formData,
                                 fechaLlegada: e.target.value,
-                              })
+                              });
                             }
+                          }
                             style={{ fontSize: "1.1rem" }}
                           />
                         </div>

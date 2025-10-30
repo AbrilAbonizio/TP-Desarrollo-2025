@@ -21,11 +21,13 @@ function sanitizedInput(req: Request, res: Response, next: NextFunction) {
     descVehiculo: req.body.descVehiculo,
     categorias: req.body.categorias
   };
-  // Validacion para que el viaje tenga al menos una categoria
-  //if (!Array.isArray(req.body.sanitizedInput.categorias) || req.body.sanitizedInput.categorias.length === 0) {
-    //return res.status(400).json({ message: 'El campo categorias debe ser un array con al menos un id' });
-  //}
 
+  // Validación que la fechaLegada sea mayor o igual a la fechaSalida
+  if (!isNaN(req.body.sanitizedInput.fechaSalida.getTime()) && !isNaN(req.body.sanitizedInput.fechaLlegada.getTime())) {
+  if (req.body.sanitizedInput.fechaLlegada <= req.body.sanitizedInput.fechaSalida) {
+    return res.status(400).json({ message: 'FechaLlegada debe ser igual o posterior a FechaSalida' });
+  }
+}
   // MÁS VALIDACIONES
   Object.keys(req.body.sanitizedInput).forEach((key) => {
     if (req.body.sanitizedInput[key] === undefined) {
