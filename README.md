@@ -49,27 +49,29 @@ El objetivo es reducir costos conectando personas con destinos y fechas similare
 
 ## 4. Iniciar la base de datos MySQL 
 
-## Opción 1: Con Docker
+# Opción 1: Con Docker
   
   Desde la carpeta Back (donde está docker-compose.yml)
   ```bash
   docker-compose up -d
+  ``` 
   
 
-### Opción 2: Sin Docker (MySQL local)
+# Opción 2: Sin Docker (MySQL local)
 
   Instalar MySQL o MariaDB en tu computadora.
 
   Crear la base de datos que usará el proyecto, por ejemplo:
     ```bash
     CREATE DATABASE dsw;
+    ´´´
 
 
 
 5. Configurar las variables de entorno 
 Crear un archivo .env dentro de la carpeta /Back con las siguientes variables:
 
-### Si usas Docker
+# Si usas Docker
     ```bash
     DB_HOST=localhost        # o el nombre del servicio en docker-compose
     DB_USER=dsw
@@ -77,9 +79,9 @@ Crear un archivo .env dentro de la carpeta /Back con las siguientes variables:
     DB_NAME=dsw
     DB_PORT=3306
     PORT=3000
+ ``` 
 
-
-### Si usas MySQL Local
+# Si usas MySQL Local
   ```bash
   DB_HOST=localhost
   DB_USER=root
@@ -87,18 +89,22 @@ Crear un archivo .env dentro de la carpeta /Back con las siguientes variables:
   DB_NAME=dsw
   DB_PORT=3306
   PORT=3000
+ ``` 
+
 
 6. Ejecutar el backend en modo desarrollo
   ```bash
   pnpm run dev
   # o
   pnpm run start:dev
+  ```  
+
 
 Esto compila TypeScript con tsc-watch y ejecuta node ./dist/app.js cuando compila correctamente.
 La API quedará disponible en: http://localhost:3000
 
 
-## Frontend
+## Frontnd
 
 1. Entrar al proyecto del front
   ```bash
@@ -116,10 +122,6 @@ La API quedará disponible en: http://localhost:3000
 
 Por defecto sirve en http://localhost:5173 (revisar consola para puerto exacto).
 
-
-```bash
-```bash
-```bash
 
 
 ### Estructura del Proyecto
