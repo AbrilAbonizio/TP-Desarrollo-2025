@@ -1,29 +1,47 @@
 import { ReactNode } from "react";
 
-interface GeneralCardProps {
-  title: string;
-  text: string;
-  img?: string;
-  children?: ReactNode;
+interface DataItemProps {
+  label: string;
+  value: ReactNode;
+  isLast?: boolean;
 }
 
-function GeneralCard(props: GeneralCardProps) {
-  const { title, text, img, children } = props;
+function DataItem({ label, value, isLast = false }: DataItemProps) {
   return (
-    <div className="card h-100 shadow-sm border">
-      <img
-        src={img}
-        className="card-img-top"
-        alt={title}
-        style={{ height: "200px", objectFit: "cover" }}
-      />
-      <div className="card-body d-flex flex-column">
-        <h5 className="card-title">{title}</h5>
-        <p className="card-text flex-grow-1">{text}</p>
-        <div className="mt-auto">{children}</div>
+    <p style={{ fontSize: "1.2rem", marginBottom: isLast ? "0" : "0.5rem" }}>
+      <strong>{label}:</strong> {value}
+    </p>
+  );
+}
+
+interface GeneralCardProps {
+  title?: string;
+  data: Array<{ label: string; value: ReactNode }>;
+  bgColor?: string;
+  titleColor?: string;
+}
+
+export default function GeneralCard({
+  title,
+  data,
+  bgColor = "bg-light",
+  titleColor = "#0d6efd",
+}: GeneralCardProps) {
+  return (
+    <div className={`card mt-4 ${bgColor}`}>
+      <div className="card-body">
+        {title && (
+          <h5 style={{ fontSize: "1.5rem", color: titleColor }}>{title}</h5>
+        )}
+        {data.map((item, index) => (
+          <DataItem
+            key={index}
+            label={item.label}
+            value={item.value}
+            isLast={index === data.length - 1}
+          />
+        ))}
       </div>
     </div>
   );
 }
-
-export default GeneralCard;

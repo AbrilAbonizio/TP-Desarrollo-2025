@@ -1,6 +1,11 @@
 import { useState } from "react";
 import SubNavBar from "../components/SubNavBar.tsx";
 import ciudadService, { Ciudad } from "../services/Ciudad.Service.ts";
+import PrimaryButton from "../components/PrimaryButton.tsx";
+import FormInput from "../components/FormInput.tsx";
+import FormCard from "../components/FormCard.tsx";
+import AlertMessage from "../components/AlertMessage.tsx";
+import GeneralCard from "../components/GeneralCard.tsx";
 
 type Vista =
   | "inicio"
@@ -49,7 +54,6 @@ export default function Ciudades() {
     setVistaActual("consultarUno");
     limpiarMensajes();
 
-    // Si se pasa un ID, buscarlo automáticamente
     if (id && id.trim()) {
       setLoading(true);
       setSearchId(id);
@@ -206,34 +210,10 @@ export default function Ciudades() {
           <div className="col-12">
             <h1 style={{ fontSize: "2.5rem", fontWeight: "bold" }}>Ciudades</h1>
 
-            {loading && (
-              <div
-                className="alert alert-info mt-4"
-                style={{ fontSize: "1.1rem" }}
-              >
-                <div
-                  className="spinner-border spinner-border-sm me-2"
-                  role="status"
-                ></div>
-                Procesando...
-              </div>
-            )}
-
-            {error && (
-              <div
-                className="alert alert-danger mt-4"
-                style={{ fontSize: "1.1rem" }}
-              >
-                {error}
-              </div>
-            )}
+            {loading && <AlertMessage type="loading" />}
+            {error && <AlertMessage type="error" message={error} />}
             {successMessage && (
-              <div
-                className="alert alert-success mt-4"
-                style={{ fontSize: "1.1rem" }}
-              >
-                {successMessage}
-              </div>
+              <AlertMessage type="success" message={successMessage} />
             )}
 
             {/* Vista: Consultar Todos */}
@@ -275,424 +255,243 @@ export default function Ciudades() {
 
             {/* Vista: Consultar Uno */}
             {vistaActual === "consultarUno" && (
-              <div className="card mt-4 shadow-lg">
-                <div className="card-body p-4">
-                  <h4 style={{ fontSize: "2rem", marginBottom: "1.5rem" }}>
-                    Consultar Ciudad por ID
-                  </h4>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleBuscarUno();
-                    }}
-                  >
-                    <div className="mb-4">
-                      <label
-                        className="form-label"
-                        style={{ fontSize: "1.2rem", fontWeight: "500" }}
-                      >
-                        ID de la Ciudad
-                      </label>
-                      <input
-                        type="number"
-                        className="form-control form-control-lg"
-                        placeholder="Ingrese el ID"
-                        value={searchId}
-                        onChange={(e) => setSearchId(e.target.value)}
-                        style={{ fontSize: "1.1rem" }}
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      className="btn btn-primary btn-lg"
-                      style={{ fontSize: "1.2rem" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Buscando..." : "Buscar"}
-                    </button>
-                  </form>
+              <FormCard title="Consultar Ciudad por ID">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleBuscarUno();
+                  }}
+                >
+                  <FormInput
+                    label="ID de la Ciudad"
+                    type="number"
+                    value={searchId}
+                    onChange={setSearchId}
+                    placeholder="Ingrese el ID"
+                  />
+                  <PrimaryButton
+                    texto={loading ? "Buscando..." : "Buscar"}
+                    onClick={handleBuscarUno}
+                    color="primary"
+                  />
+                </form>
 
-                  {ciudadEncontrada && (
-                    <div className="card mt-4 bg-light">
-                      <div className="card-body">
-                        <h5 style={{ fontSize: "1.5rem", color: "#0d6efd" }}>
-                          Resultado:
-                        </h5>
-                        <p
-                          style={{ fontSize: "1.2rem", marginBottom: "0.5rem" }}
-                        >
-                          <strong>ID:</strong> {ciudadEncontrada.id}
-                        </p>
-                        <p
-                          style={{ fontSize: "1.2rem", marginBottom: "0.5rem" }}
-                        >
-                          <strong>Nombre:</strong> {ciudadEncontrada.nombre}
-                        </p>
-                        <p
-                          style={{ fontSize: "1.2rem", marginBottom: "0.5rem" }}
-                        >
-                          <strong>Provincia:</strong>{" "}
-                          {ciudadEncontrada.provincia}
-                        </p>
-                        <p
-                          style={{ fontSize: "1.2rem", marginBottom: "0.5rem" }}
-                        >
-                          <strong>Latitud:</strong> {ciudadEncontrada.latitud}
-                        </p>
-                        <p style={{ fontSize: "1.2rem", marginBottom: "0" }}>
-                          <strong>Longitud:</strong> {ciudadEncontrada.longitud}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+                {ciudadEncontrada && (
+                  <GeneralCard
+                    title="Resultado:"
+                    data={[
+                      { label: "ID", value: ciudadEncontrada.id },
+                      { label: "Nombre", value: ciudadEncontrada.nombre },
+                      { label: "Provincia", value: ciudadEncontrada.provincia },
+                      { label: "Latitud", value: ciudadEncontrada.latitud },
+                      { label: "Longitud", value: ciudadEncontrada.longitud },
+                    ]}
+                  />
+                )}
+              </FormCard>
             )}
 
             {/* Vista: Agregar */}
             {vistaActual === "agregar" && (
-              <div className="card mt-4 shadow-lg">
-                <div className="card-body p-4">
-                  <h4 style={{ fontSize: "2rem", marginBottom: "1.5rem" }}>
-                    Agregar Nueva Ciudad
-                  </h4>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleGuardarNuevo();
-                    }}
-                  >
-                    <div className="row">
-                      <div className="col-md-6 mb-4">
-                        <label
-                          className="form-label"
-                          style={{ fontSize: "1.2rem", fontWeight: "500" }}
-                        >
-                          Nombre *
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control form-control-lg"
-                          value={formData.nombre}
-                          onChange={(e) =>
-                            setFormData({ ...formData, nombre: e.target.value })
-                          }
-                          placeholder="Ingrese el nombre"
-                          style={{ fontSize: "1.1rem" }}
-                        />
-                      </div>
-                      <div className="col-md-6 mb-4">
-                        <label
-                          className="form-label"
-                          style={{ fontSize: "1.2rem", fontWeight: "500" }}
-                        >
-                          Provincia *
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control form-control-lg"
-                          value={formData.provincia}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              provincia: e.target.value,
-                            })
-                          }
-                          placeholder="Ingrese la provincia"
-                          style={{ fontSize: "1.1rem" }}
-                        />
-                      </div>
+              <FormCard title="Agregar Nueva Ciudad">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleGuardarNuevo();
+                  }}
+                >
+                  <div className="row">
+                    <div className="col-md-6">
+                      <FormInput
+                        label="Nombre"
+                        value={formData.nombre}
+                        onChange={(value) =>
+                          setFormData({ ...formData, nombre: value })
+                        }
+                        placeholder="Ingrese el nombre"
+                        required
+                      />
                     </div>
-                    <div className="row">
-                      <div className="col-md-6 mb-4">
-                        <label
-                          className="form-label"
-                          style={{ fontSize: "1.2rem", fontWeight: "500" }}
-                        >
-                          Latitud
-                        </label>
-                        <input
-                          type="number"
-                          step="any"
-                          className="form-control form-control-lg"
-                          value={formData.latitud}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              latitud: Number(e.target.value),
-                            })
-                          }
-                          style={{ fontSize: "1.1rem" }}
-                        />
-                      </div>
-                      <div className="col-md-6 mb-4">
-                        <label
-                          className="form-label"
-                          style={{ fontSize: "1.2rem", fontWeight: "500" }}
-                        >
-                          Longitud
-                        </label>
-                        <input
-                          type="number"
-                          step="any"
-                          className="form-control form-control-lg"
-                          value={formData.longitud}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              longitud: Number(e.target.value),
-                            })
-                          }
-                          style={{ fontSize: "1.1rem" }}
-                        />
-                      </div>
+                    <div className="col-md-6">
+                      <FormInput
+                        label="Provincia"
+                        value={formData.provincia}
+                        onChange={(value) =>
+                          setFormData({ ...formData, provincia: value })
+                        }
+                        placeholder="Ingrese la provincia"
+                        required
+                      />
                     </div>
-                    <button
-                      type="submit"
-                      className="btn btn-primary btn-lg"
-                      style={{ fontSize: "1.2rem" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Guardando..." : "Guardar"}
-                    </button>
-                  </form>
-                </div>
-              </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <FormInput
+                        label="Latitud"
+                        type="number"
+                        step="any"
+                        value={formData.latitud}
+                        onChange={(value) =>
+                          setFormData({ ...formData, latitud: Number(value) })
+                        }
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <FormInput
+                        label="Longitud"
+                        type="number"
+                        step="any"
+                        value={formData.longitud}
+                        onChange={(value) =>
+                          setFormData({ ...formData, longitud: Number(value) })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <PrimaryButton
+                    texto={loading ? "Guardando..." : "Guardar"}
+                    onClick={handleGuardarNuevo}
+                    color="primary"
+                  />
+                </form>
+              </FormCard>
             )}
 
             {/* Vista: Modificar */}
             {vistaActual === "modificar" && (
-              <div className="card mt-4 shadow-lg">
-                <div className="card-body p-4">
-                  <h4 style={{ fontSize: "2rem", marginBottom: "1.5rem" }}>
-                    Modificar Ciudad
-                  </h4>
+              <FormCard title="Modificar Ciudad">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleBuscarModificar();
+                  }}
+                >
+                  <FormInput
+                    label="ID de la Ciudad a Modificar"
+                    type="number"
+                    value={searchId}
+                    onChange={setSearchId}
+                    placeholder="Ingrese el ID"
+                  />
+                  <PrimaryButton
+                    texto={loading ? "Buscando..." : "Buscar"}
+                    onClick={handleBuscarModificar}
+                    color="primary"
+                  />
+                </form>
+
+                {formData.id && (
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
-                      handleBuscarModificar();
+                      handleGuardarModificacion();
                     }}
+                    className="mt-4 pt-4 border-top"
                   >
-                    <div className="mb-4">
-                      <label
-                        className="form-label"
-                        style={{ fontSize: "1.2rem", fontWeight: "500" }}
-                      >
-                        ID de la Ciudad a Modificar
-                      </label>
-                      <input
-                        type="number"
-                        className="form-control form-control-lg"
-                        placeholder="Ingrese el ID"
-                        value={searchId}
-                        onChange={(e) => setSearchId(e.target.value)}
-                        style={{ fontSize: "1.1rem" }}
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      className="btn btn-primary btn-lg"
-                      style={{ fontSize: "1.2rem" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Buscando..." : "Buscar"}
-                    </button>
-                  </form>
-
-                  {formData.id && (
-                    <form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        handleGuardarModificacion();
-                      }}
-                      className="mt-4 pt-4 border-top"
-                    >
-                      <h5
-                        style={{ fontSize: "1.5rem", marginBottom: "1.5rem" }}
-                      >
-                        Editar Datos
-                      </h5>
-                      <div className="mb-4">
-                        <label
-                          className="form-label"
-                          style={{ fontSize: "1.2rem", fontWeight: "500" }}
-                        >
-                          ID
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control form-control-lg"
-                          value={formData.id}
-                          disabled
-                          style={{
-                            fontSize: "1.1rem",
-                            backgroundColor: "#e9ecef",
-                          }}
+                    <h5 style={{ fontSize: "1.5rem", marginBottom: "1.5rem" }}>
+                      Editar Datos
+                    </h5>
+                    <FormInput
+                      label="ID"
+                      value={formData.id}
+                      onChange={() => {}}
+                      disabled
+                    />
+                    <div className="row">
+                      <div className="col-md-6">
+                        <FormInput
+                          label="Nombre"
+                          value={formData.nombre}
+                          onChange={(value) =>
+                            setFormData({ ...formData, nombre: value })
+                          }
+                          required
                         />
                       </div>
-                      <div className="row">
-                        <div className="col-md-6 mb-4">
-                          <label
-                            className="form-label"
-                            style={{ fontSize: "1.2rem", fontWeight: "500" }}
-                          >
-                            Nombre *
-                          </label>
-                          <input
-                            type="text"
-                            className="form-control form-control-lg"
-                            value={formData.nombre}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                nombre: e.target.value,
-                              })
-                            }
-                            style={{ fontSize: "1.1rem" }}
-                          />
-                        </div>
-                        <div className="col-md-6 mb-4">
-                          <label
-                            className="form-label"
-                            style={{ fontSize: "1.2rem", fontWeight: "500" }}
-                          >
-                            Provincia *
-                          </label>
-                          <input
-                            type="text"
-                            className="form-control form-control-lg"
-                            value={formData.provincia}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                provincia: e.target.value,
-                              })
-                            }
-                            style={{ fontSize: "1.1rem" }}
-                          />
-                        </div>
+                      <div className="col-md-6">
+                        <FormInput
+                          label="Provincia"
+                          value={formData.provincia}
+                          onChange={(value) =>
+                            setFormData({ ...formData, provincia: value })
+                          }
+                          required
+                        />
                       </div>
-                      <div className="row">
-                        <div className="col-md-6 mb-4">
-                          <label
-                            className="form-label"
-                            style={{ fontSize: "1.2rem", fontWeight: "500" }}
-                          >
-                            Latitud
-                          </label>
-                          <input
-                            type="number"
-                            step="any"
-                            className="form-control form-control-lg"
-                            value={formData.latitud}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                latitud: Number(e.target.value),
-                              })
-                            }
-                            style={{ fontSize: "1.1rem" }}
-                          />
-                        </div>
-                        <div className="col-md-6 mb-4">
-                          <label
-                            className="form-label"
-                            style={{ fontSize: "1.2rem", fontWeight: "500" }}
-                          >
-                            Longitud
-                          </label>
-                          <input
-                            type="number"
-                            step="any"
-                            className="form-control form-control-lg"
-                            value={formData.longitud}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                longitud: Number(e.target.value),
-                              })
-                            }
-                            style={{ fontSize: "1.1rem" }}
-                          />
-                        </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-md-6">
+                        <FormInput
+                          label="Latitud"
+                          type="number"
+                          step="any"
+                          value={formData.latitud}
+                          onChange={(value) =>
+                            setFormData({ ...formData, latitud: Number(value) })
+                          }
+                        />
                       </div>
-                      <button
-                        type="submit"
-                        className="btn btn-success btn-lg"
-                        style={{ fontSize: "1.2rem" }}
-                        disabled={loading}
-                      >
-                        {loading ? "Actualizando..." : "Actualizar"}
-                      </button>
-                    </form>
-                  )}
-                </div>
-              </div>
+                      <div className="col-md-6">
+                        <FormInput
+                          label="Longitud"
+                          type="number"
+                          step="any"
+                          value={formData.longitud}
+                          onChange={(value) =>
+                            setFormData({
+                              ...formData,
+                              longitud: Number(value),
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <PrimaryButton
+                      texto={loading ? "Actualizando..." : "Actualizar"}
+                      onClick={handleGuardarModificacion}
+                      color="success"
+                    />
+                  </form>
+                )}
+              </FormCard>
             )}
 
             {/* Vista: Eliminar */}
             {vistaActual === "eliminar" && (
-              <div className="card mt-4 shadow-lg border-danger">
-                <div className="card-body p-4">
-                  <h4
-                    style={{
-                      fontSize: "2rem",
-                      marginBottom: "1.5rem",
-                      color: "#dc3545",
-                    }}
-                  >
-                    Eliminar Ciudad
-                  </h4>
-                  <div
-                    className="alert alert-warning"
-                    style={{ fontSize: "1.1rem" }}
-                  >
-                    <strong>⚠️ Advertencia:</strong> Esta acción no se puede
-                    deshacer
-                  </div>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleConfirmarEliminar();
-                    }}
-                  >
-                    <div className="mb-4">
-                      <label
-                        className="form-label"
-                        style={{ fontSize: "1.2rem", fontWeight: "500" }}
-                      >
-                        ID de la Ciudad a Eliminar
-                      </label>
-                      <input
-                        type="number"
-                        className="form-control form-control-lg"
-                        placeholder="Ingrese el ID"
-                        value={searchId}
-                        onChange={(e) => setSearchId(e.target.value)}
-                        style={{ fontSize: "1.1rem" }}
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      className="btn btn-danger btn-lg"
-                      style={{ fontSize: "1.2rem" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Eliminando..." : "Eliminar"}
-                    </button>
-                  </form>
-                </div>
-              </div>
+              <FormCard
+                title="Eliminar Ciudad"
+                titleColor="#dc3545"
+                borderColor="danger"
+                warning="Esta acción no se puede deshacer"
+              >
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleConfirmarEliminar();
+                  }}
+                >
+                  <FormInput
+                    label="ID de la Ciudad a Eliminar"
+                    type="number"
+                    value={searchId}
+                    onChange={setSearchId}
+                    placeholder="Ingrese el ID"
+                  />
+                  <PrimaryButton
+                    texto={loading ? "Eliminando..." : "Eliminar"}
+                    onClick={handleConfirmarEliminar}
+                    color="danger"
+                  />
+                </form>
+              </FormCard>
             )}
 
             {/* Vista: Inicio */}
             {vistaActual === "inicio" && (
-              <div
-                className="alert alert-info mt-4"
-                style={{ fontSize: "1.3rem", padding: "1.5rem" }}
-              >
-                👆 Seleccione una opción del menú superior para comenzar
-              </div>
+              <AlertMessage
+                type="info"
+                message="👆 Seleccione una opción del menú superior para comenzar"
+              />
             )}
           </div>
         </div>

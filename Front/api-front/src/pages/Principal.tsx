@@ -1,4 +1,4 @@
-import GeneralCard from "../components/GeneralCard.tsx";
+import Card from "../components/Card.tsx";
 import PrimaryButton from "../components/PrimaryButton.tsx";
 import { useNavigate } from "react-router-dom";
 
@@ -42,9 +42,13 @@ export default function Principal() {
       <div className="row g-4 px-3 px-md-5">
         {cards.map((c, i) => (
           <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={i}>
-            <GeneralCard title={c.title} text={c.text} img={c.img}>
-              <PrimaryButton texto="Ver más" onClick={c.onClick} />
-            </GeneralCard>
+            <Card title={c.title} text={c.text} img={c.img}>
+              <PrimaryButton
+                texto="Ver más"
+                onClick={c.onClick}
+                color="light"
+              />
+            </Card>
           </div>
         ))}
       </div>

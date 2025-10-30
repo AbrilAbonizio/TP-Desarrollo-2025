@@ -2,6 +2,9 @@ import { useState } from "react";
 import SubNavBar from "../components/SubNavBar.tsx";
 import pasajeroService, { Pasajero } from "../services/Pasajero.Service.ts";
 import solicitudService, { Solicitud } from "../services/Solicitud.Service.ts";
+import PrimaryButton, {
+  PrimaryOutlineButton,
+} from "../components/PrimaryButton.tsx";
 
 type Vista =
   | "inicio"
@@ -60,7 +63,7 @@ export default function Pasajeros() {
   const handleConsultar = async (id?: string) => {
     limpiarMensajes();
     setVistaActual("consultarUno");
-    
+
     if (id && id.trim()) {
       setLoading(true);
       setSearchId(id);
@@ -346,13 +349,11 @@ export default function Pasajeros() {
                           <br />
                           <strong>Dirección:</strong> {pasajero.direccion}
                         </p>
-                        <button
-                          type="button"
-                          className="btn btn-outline-info w-100"
+                        <PrimaryOutlineButton
+                          texto="Ver Viajes Solicitados"
                           onClick={() => handleVerSolicitudes(pasajero)}
-                        >
-                          Ver Viajes Solicitados
-                        </button>
+                          color="info"
+                        />
                       </div>
                     </div>
                   </div>
@@ -389,14 +390,11 @@ export default function Pasajeros() {
                         style={{ fontSize: "1.1rem" }}
                       />
                     </div>
-                    <button
-                      type="submit"
-                      className="btn btn-primary btn-lg"
-                      style={{ fontSize: "1.2rem" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Buscando..." : "Buscar"}
-                    </button>
+                    <PrimaryButton
+                      texto={loading ? "Buscando..." : "Buscar"}
+                      onClick={handleBuscarUno}
+                      color="primary"
+                    />
                   </form>
 
                   {pasajeroEncontrado && (
@@ -436,15 +434,13 @@ export default function Pasajeros() {
                           <strong>Dirección:</strong>{" "}
                           {pasajeroEncontrado.direccion}
                         </p>
-                        <button
-                          type="button"
-                          className="btn btn-outline-info"
+                        <PrimaryOutlineButton
+                          texto="Ver Viajes Solicitados"
                           onClick={() =>
                             handleVerSolicitudes(pasajeroEncontrado)
                           }
-                        >
-                          Ver Viajes Solicitados
-                        </button>
+                          color="info"
+                        />
                       </div>
                     </div>
                   )}
@@ -525,37 +521,40 @@ export default function Pasajeros() {
                           style={{ fontSize: "1.1rem" }}
                         />
                       </div>
-                        <div className="col-md-6 mb-4">
-                          <label
-                            className="form-label"
-                            style={{ fontSize: "1.2rem", fontWeight: "500" }}
-                          >
-                            Teléfono
-                          </label>
-                          <input
-                            type="tel"
-                            className="form-control form-control-lg"
-                            value={formData.telefono}
-                            onChange={(e) => {
-                              // Remover cualquier caracter que no sea número
-                              const numerosOnly = e.target.value.replace(/\D/g, '');
-                              setFormData({
-                                ...formData,
-                                telefono: numerosOnly,
-                              });
-                            }}
-                            onKeyPress={(e) => {
-                              // Prevenir la entrada de caracteres no numéricos
-                              if (!/[0-9]/.test(e.key)) {
-                                e.preventDefault();
-                              }
-                            }}
-                            placeholder="Ingrese el teléfono (solo números)"
-                            style={{ fontSize: "1.1rem" }}
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                          />
-                        </div>
+                      <div className="col-md-6 mb-4">
+                        <label
+                          className="form-label"
+                          style={{ fontSize: "1.2rem", fontWeight: "500" }}
+                        >
+                          Teléfono
+                        </label>
+                        <input
+                          type="tel"
+                          className="form-control form-control-lg"
+                          value={formData.telefono}
+                          onChange={(e) => {
+                            // Remover cualquier caracter que no sea número
+                            const numerosOnly = e.target.value.replace(
+                              /\D/g,
+                              ""
+                            );
+                            setFormData({
+                              ...formData,
+                              telefono: numerosOnly,
+                            });
+                          }}
+                          onKeyPress={(e) => {
+                            // Prevenir la entrada de caracteres no numéricos
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                          }}
+                          placeholder="Ingrese el teléfono (solo números)"
+                          style={{ fontSize: "1.1rem" }}
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                        />
+                      </div>
                     </div>
                     <div className="mb-4">
                       <label
@@ -578,14 +577,11 @@ export default function Pasajeros() {
                         style={{ fontSize: "1.1rem" }}
                       />
                     </div>
-                    <button
-                      type="submit"
-                      className="btn btn-primary btn-lg"
-                      style={{ fontSize: "1.2rem" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Guardando..." : "Guardar"}
-                    </button>
+                    <PrimaryButton
+                      texto={loading ? "Guardando..." : "Guardar"}
+                      onClick={handleGuardarNuevo}
+                      color="primary"
+                    />
                   </form>
                 </div>
               </div>
@@ -620,14 +616,11 @@ export default function Pasajeros() {
                         style={{ fontSize: "1.1rem" }}
                       />
                     </div>
-                    <button
-                      type="submit"
-                      className="btn btn-primary btn-lg"
-                      style={{ fontSize: "1.2rem" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Buscando..." : "Buscar"}
-                    </button>
+                    <PrimaryButton
+                      texto={loading ? "Buscando..." : "Buscar"}
+                      onClick={handleBuscarModificar}
+                      color="primary"
+                    />
                   </form>
 
                   {formData.id && (
@@ -737,7 +730,10 @@ export default function Pasajeros() {
                             value={formData.telefono}
                             onChange={(e) => {
                               // Remover cualquier caracter que no sea número
-                              const numerosOnly = e.target.value.replace(/\D/g, '');
+                              const numerosOnly = e.target.value.replace(
+                                /\D/g,
+                                ""
+                              );
                               setFormData({
                                 ...formData,
                                 telefono: numerosOnly,
@@ -776,14 +772,11 @@ export default function Pasajeros() {
                           style={{ fontSize: "1.1rem" }}
                         />
                       </div>
-                      <button
-                        type="submit"
-                        className="btn btn-success btn-lg"
-                        style={{ fontSize: "1.2rem" }}
-                        disabled={loading}
-                      >
-                        {loading ? "Actualizando..." : "Actualizar"}
-                      </button>
+                      <PrimaryButton
+                        texto={loading ? "Actualizando..." : "Actualizar"}
+                        onClick={handleGuardarModificacion}
+                        color="success"
+                      />
                     </form>
                   )}
                 </div>
@@ -832,14 +825,11 @@ export default function Pasajeros() {
                         style={{ fontSize: "1.1rem" }}
                       />
                     </div>
-                    <button
-                      type="submit"
-                      className="btn btn-danger btn-lg"
-                      style={{ fontSize: "1.2rem" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Eliminando..." : "Eliminar"}
-                    </button>
+                    <PrimaryButton
+                      texto={loading ? "Eliminando..." : "Eliminar"}
+                      onClick={handleConfirmarEliminar}
+                      color="danger"
+                    />
                   </form>
                 </div>
               </div>

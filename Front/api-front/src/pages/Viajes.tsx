@@ -5,6 +5,7 @@ import ciudadService, { Ciudad } from "../services/Ciudad.Service.ts";
 import pasajeroService, { Pasajero } from "../services/Pasajero.Service.ts";
 import categoriaService, { Categoria } from "../services/Categoria.Service.ts";
 import solicitudService from "../services/Solicitud.Service.ts";
+import PrimaryButton from "../components/PrimaryButton.tsx";
 
 type Vista =
   | "inicio"
@@ -38,7 +39,9 @@ export default function Viajes() {
 
   // Estados para el modal de solicitud
   const [showSolicitudModal, setShowSolicitudModal] = useState<boolean>(false);
-  const [viajeSeleccionado, setViajeSeleccionado] = useState<number | null>(null);
+  const [viajeSeleccionado, setViajeSeleccionado] = useState<number | null>(
+    null
+  );
   const [pasajeroId, setPasajeroId] = useState<string>("");
 
   // Estados para los selectores
@@ -79,16 +82,21 @@ export default function Viajes() {
       }
 
       // Verificamos que no exista una solicitud pendiente para este viaje y pasajero
-      const solicitudesExistentes = await solicitudService.getSolicitudesByPasajero(Number(pasajeroId));
+      const solicitudesExistentes =
+        await solicitudService.getSolicitudesByPasajero(Number(pasajeroId));
       const solicitudExistente = solicitudesExistentes.find(
-        s => s.viaje.id === viajeSeleccionado && 
-            (s.estado.toLowerCase() === "pendiente" || s.estado.toLowerCase() === "aceptada")
+        (s) =>
+          s.viaje.id === viajeSeleccionado &&
+          (s.estado.toLowerCase() === "pendiente" ||
+            s.estado.toLowerCase() === "aceptada")
       );
 
       if (solicitudExistente) {
-        setError(solicitudExistente.estado.toLowerCase() === "pendiente" 
-          ? "Ya tienes una solicitud pendiente para este viaje" 
-          : "Ya tienes una solicitud aceptada para este viaje");
+        setError(
+          solicitudExistente.estado.toLowerCase() === "pendiente"
+            ? "Ya tienes una solicitud pendiente para este viaje"
+            : "Ya tienes una solicitud aceptada para este viaje"
+        );
         setLoading(false);
         return;
       }
@@ -97,11 +105,13 @@ export default function Viajes() {
         idViaje: viajeSeleccionado,
         idPasajero: Number(pasajeroId),
         fechaSolicitud: new Date().toISOString(),
-        estado: "pendiente"
+        estado: "pendiente",
       };
 
       await solicitudService.createSolicitud(solicitud);
-      setSuccessMessage(`Solicitud creada exitosamente para el viaje #${viajeSeleccionado}`);
+      setSuccessMessage(
+        `Solicitud creada exitosamente para el viaje #${viajeSeleccionado}`
+      );
     } catch (err) {
       setError(`Error al crear la solicitud: ${err}`);
     } finally {
@@ -485,7 +495,10 @@ export default function Viajes() {
                           Viaje #{viaje.id}
                         </h5>
                         <div className="flex-grow-1">
-                          <p className="card-text mb-0" style={{ fontSize: "1.1rem" }}>
+                          <p
+                            className="card-text mb-0"
+                            style={{ fontSize: "1.1rem" }}
+                          >
                             <strong>Ciudad:</strong> {viaje.ciudad?.nombre}
                             <br />
                             <strong>Organizador:</strong>{" "}
@@ -505,13 +518,13 @@ export default function Viajes() {
                             <strong>Costo:</strong> ${viaje.costoEstimado}
                           </p>
                         </div>
-                        <button
-                          className="btn btn-success w-100 mt-3"
+                        <PrimaryButton
+                          texto={
+                            loading ? "Procesando..." : "Realizar Solicitud"
+                          }
                           onClick={() => handleAbrirModalSolicitud(viaje.id!)}
-                          disabled={loading}
-                        >
-                          {loading ? "Procesando..." : "Realizar Solicitud"}
-                        </button>
+                          color="success"
+                        />
                       </div>
                     </div>
                   </div>
@@ -548,14 +561,11 @@ export default function Viajes() {
                         style={{ fontSize: "1.1rem" }}
                       />
                     </div>
-                    <button
-                      type="submit"
-                      className="btn btn-primary btn-lg"
-                      style={{ fontSize: "1.2rem" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Buscando..." : "Buscar Viaje"}
-                    </button>
+                    <PrimaryButton
+                      texto={loading ? "Buscando..." : "Buscar Viaje"}
+                      onClick={() => handleConsultar(searchCategoriaId)}
+                      color="primary"
+                    />
                   </form>
 
                   {/* Mostrar viaje encontrado */}
@@ -733,14 +743,11 @@ export default function Viajes() {
                       />
                     </div>
 
-                    <button
-                      type="submit"
-                      className="btn btn-primary btn-lg"
-                      style={{ fontSize: "1.2rem" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Buscando..." : "Buscar Viajes"}
-                    </button>
+                    <PrimaryButton
+                      texto={loading ? "Buscando..." : "Buscar Viajes"}
+                      onClick={handleBuscarUno}
+                      color="primary"
+                    />
                   </form>
 
                   {/* Resultados: Múltiples Viajes */}
@@ -777,17 +784,22 @@ export default function Viajes() {
                                 <hr />
                                 <div className="flex-grow-1">
                                   <div className="mb-3">
-                                    <strong>Ciudad:</strong> {viaje.ciudad?.nombre}
+                                    <strong>Ciudad:</strong>{" "}
+                                    {viaje.ciudad?.nombre}
                                     <br />
                                     <strong>Organizador:</strong>{" "}
                                     {viaje.organizador?.nombre}{" "}
                                     {viaje.organizador?.apellido}
                                     <br />
                                     <strong>Salida:</strong>{" "}
-                                    {new Date(viaje.fechaSalida).toLocaleDateString()}
+                                    {new Date(
+                                      viaje.fechaSalida
+                                    ).toLocaleDateString()}
                                     <br />
                                     <strong>Llegada:</strong>{" "}
-                                    {new Date(viaje.fechaLlegada).toLocaleDateString()}
+                                    {new Date(
+                                      viaje.fechaLlegada
+                                    ).toLocaleDateString()}
                                     <br />
                                     <strong>Estado:</strong>{" "}
                                     <span className="badge bg-success">
@@ -796,19 +808,24 @@ export default function Viajes() {
                                     <br />
                                     <strong>Cupos:</strong> {viaje.cupos}
                                     <br />
-                                    <strong>Costo:</strong> ${viaje.costoEstimado}
+                                    <strong>Costo:</strong> $
+                                    {viaje.costoEstimado}
                                     <br />
                                     <strong>Vehículo:</strong>{" "}
                                     {viaje.descVehiculo}
                                   </div>
                                 </div>
-                                <button
-                                  className="btn btn-success w-100 mt-3"
-                                  onClick={() => handleAbrirModalSolicitud(viaje.id!)}
-                                  disabled={loading}
-                                >
-                                  {loading ? "Procesando..." : "Realizar Solicitud"}
-                                </button>
+                                <PrimaryButton
+                                  texto={
+                                    loading
+                                      ? "Procesando..."
+                                      : "Realizar Solicitud"
+                                  }
+                                  onClick={() =>
+                                    handleAbrirModalSolicitud(viaje.id!)
+                                  }
+                                  color="success"
+                                />
                               </div>
                             </div>
                           </div>
@@ -1024,14 +1041,11 @@ export default function Viajes() {
                         ))}
                       </div>
                     </div>
-                    <button
-                      type="submit"
-                      className="btn btn-primary btn-lg"
-                      style={{ fontSize: "1.2rem" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Guardando..." : "Guardar"}
-                    </button>
+                    <PrimaryButton
+                      texto={loading ? "Guardando..." : "Guardar"}
+                      onClick={handleGuardarNuevo}
+                      color="primary"
+                    />
                   </form>
                 </div>
               </div>
@@ -1066,14 +1080,11 @@ export default function Viajes() {
                         style={{ fontSize: "1.1rem" }}
                       />
                     </div>
-                    <button
-                      type="submit"
-                      className="btn btn-primary btn-lg"
-                      style={{ fontSize: "1.2rem" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Buscando..." : "Buscar"}
-                    </button>
+                    <PrimaryButton
+                      texto={loading ? "Buscando..." : "Buscar"}
+                      onClick={handleBuscarModificar}
+                      color="primary"
+                    />
                   </form>
 
                   {formData.id && (
@@ -1321,14 +1332,11 @@ export default function Viajes() {
                           ))}
                         </div>
                       </div>
-                      <button
-                        type="submit"
-                        className="btn btn-success btn-lg"
-                        style={{ fontSize: "1.2rem" }}
-                        disabled={loading}
-                      >
-                        {loading ? "Actualizando..." : "Actualizar"}
-                      </button>
+                      <PrimaryButton
+                        texto={loading ? "Actualizando..." : "Actualizar"}
+                        onClick={handleGuardarModificacion}
+                        color="success"
+                      />
                     </form>
                   )}
                 </div>
@@ -1377,14 +1385,11 @@ export default function Viajes() {
                         style={{ fontSize: "1.1rem" }}
                       />
                     </div>
-                    <button
-                      type="submit"
-                      className="btn btn-danger btn-lg"
-                      style={{ fontSize: "1.2rem" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Eliminando..." : "Eliminar"}
-                    </button>
+                    <PrimaryButton
+                      texto={loading ? "Eliminando..." : "Eliminar"}
+                      onClick={handleConfirmarEliminar}
+                      color="danger"
+                    />
                   </form>
                 </div>
               </div>
@@ -1458,10 +1463,12 @@ export default function Viajes() {
               </button>
             </div>
 
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              handleRealizarSolicitud();
-            }}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleRealizarSolicitud();
+              }}
+            >
               <div className="mb-4">
                 <label
                   className="form-label"
@@ -1478,16 +1485,13 @@ export default function Viajes() {
                   style={{ fontSize: "1.1rem" }}
                 />
               </div>
-              <button
-                type="submit"
-                className="btn btn-success btn-lg w-100"
-                style={{ fontSize: "1.2rem" }}
-                disabled={loading}
-              >
-                {loading ? "Procesando..." : "Confirmar Solicitud"}
-              </button>
+              <PrimaryButton
+                texto={loading ? "Procesando..." : "Confirmar Solicitud"}
+                onClick={handleRealizarSolicitud}
+                color="success"
+              />
             </form>
-            
+
             {error && (
               <div
                 className="alert alert-danger mt-3"

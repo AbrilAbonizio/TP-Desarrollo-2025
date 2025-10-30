@@ -1,6 +1,7 @@
 import { useState } from "react";
 import SubNavBar from "../components/SubNavBar.tsx";
 import categoriaService, { Categoria } from "../services/Categoria.Service.ts";
+import PrimaryButton from "../components/PrimaryButton.tsx";
 
 type Vista =
   | "inicio"
@@ -258,13 +259,13 @@ export default function Categorias() {
                     key={cat.id}
                     className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4"
                   >
-                    <div 
-                      className="card shadow" 
+                    <div
+                      className="card shadow"
                       style={{
                         minHeight: "160px",
                         maxHeight: "200px",
                         display: "flex",
-                        flexDirection: "column"
+                        flexDirection: "column",
                       }}
                     >
                       <div className="card-body d-flex flex-column">
@@ -274,11 +275,11 @@ export default function Categorias() {
                         >
                           ID: {cat.id}
                         </h5>
-                        <p 
-                          className="card-text flex-grow-1" 
-                          style={{ 
+                        <p
+                          className="card-text flex-grow-1"
+                          style={{
                             fontSize: "1.2rem",
-                            overflow: "auto"
+                            overflow: "auto",
                           }}
                         >
                           {cat.descripcion}
@@ -319,14 +320,11 @@ export default function Categorias() {
                         style={{ fontSize: "1.1rem" }}
                       />
                     </div>
-                    <button
-                      type="submit"
-                      className="btn btn-primary btn-lg"
-                      style={{ fontSize: "1.2rem" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Buscando..." : "Buscar"}
-                    </button>
+                    <PrimaryButton
+                      texto={loading ? "Buscando..." : "Buscar"}
+                      onClick={handleBuscarUno}
+                      color="primary"
+                    />
                   </form>
 
                   {categoriaEncontrada && (
@@ -388,14 +386,11 @@ export default function Categorias() {
                         style={{ fontSize: "1.1rem" }}
                       />
                     </div>
-                    <button
-                      type="submit"
-                      className="btn btn-primary btn-lg"
-                      style={{ fontSize: "1.2rem" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Guardando..." : "Guardar"}
-                    </button>
+                    <PrimaryButton
+                      texto={loading ? "Guardando..." : "Guardar"}
+                      onClick={handleGuardarNuevo}
+                      color="primary"
+                    />
                   </form>
                 </div>
               </div>
@@ -430,14 +425,11 @@ export default function Categorias() {
                         style={{ fontSize: "1.1rem" }}
                       />
                     </div>
-                    <button
-                      type="submit"
-                      className="btn btn-primary btn-lg"
-                      style={{ fontSize: "1.2rem" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Buscando..." : "Buscar"}
-                    </button>
+                    <PrimaryButton
+                      texto={loading ? "Buscando..." : "Buscar"}
+                      onClick={handleBuscarModificar}
+                      color="primary"
+                    />
                   </form>
 
                   {formData.id && (
@@ -494,14 +486,11 @@ export default function Categorias() {
                           style={{ fontSize: "1.1rem" }}
                         />
                       </div>
-                      <button
-                        type="submit"
-                        className="btn btn-success btn-lg"
-                        style={{ fontSize: "1.2rem" }}
-                        disabled={loading}
-                      >
-                        {loading ? "Actualizando..." : "Actualizar"}
-                      </button>
+                      <PrimaryButton
+                        texto={loading ? "Actualizando..." : "Actualizar"}
+                        onClick={handleGuardarModificacion}
+                        color="success"
+                      />
                     </form>
                   )}
                 </div>
@@ -550,14 +539,11 @@ export default function Categorias() {
                         style={{ fontSize: "1.1rem" }}
                       />
                     </div>
-                    <button
-                      type="submit"
-                      className="btn btn-danger btn-lg"
-                      style={{ fontSize: "1.2rem" }}
-                      disabled={loading}
-                    >
-                      {loading ? "Eliminando..." : "Eliminar"}
-                    </button>
+                    <PrimaryButton
+                      texto={loading ? "Eliminando..." : "Eliminar"}
+                      onClick={handleConfirmarEliminar}
+                      color="danger"
+                    />
                   </form>
                 </div>
               </div>
